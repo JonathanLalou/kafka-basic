@@ -1,3 +1,4 @@
+# SpringBoot's properties available by default
 spring:
   kafka:
     consumer:
@@ -5,6 +6,7 @@ spring:
       auto-offset-reset: earliest
     bootstrap-servers: localhost:9092
 
+# specific to current application
 tpd:
   topic-name: advice-topic
   messages-per-request: 10
