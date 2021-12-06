@@ -1,4 +1,6 @@
 # SpringBoot's properties available by default
+server:
+  port: 8282
 spring:
   kafka:
     consumer:
