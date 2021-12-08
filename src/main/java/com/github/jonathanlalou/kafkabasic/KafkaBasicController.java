@@ -34,6 +34,7 @@ public class KafkaBasicController {
         logger.info("GET hello");
         final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
         for (int i = 0; i < messagePerRequest; i++) {
+            logger.info("Sending #{}", i);
             this.template.send(
                     topicName
                     , String.valueOf(i)
