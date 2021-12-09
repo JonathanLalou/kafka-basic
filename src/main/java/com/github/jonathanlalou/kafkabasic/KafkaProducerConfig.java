@@ -12,9 +12,11 @@ import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -23,6 +25,21 @@ public class KafkaProducerConfig {
 
     @Value("${tpd.topic-name}")
     private String topicName;
+
+    @Bean
+    public Executor asyncExecutor(
+            @Value("${spring.task.execution.pool.core-size}") final Integer corePoolSize
+            , @Value("${spring.task.execution.pool.core-size}") final Integer maxPoolSize
+            , @Value("${spring.task.execution.pool.queue-capacity}") final Integer queueCapacity
+    ) {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(corePoolSize);
+        executor.setMaxPoolSize(maxPoolSize);
+        executor.setQueueCapacity(queueCapacity);
+        executor.setThreadNamePrefix("Async-");
+        executor.initialize();
+        return executor;
+    }
 
     // Producer configuration
     @Bean

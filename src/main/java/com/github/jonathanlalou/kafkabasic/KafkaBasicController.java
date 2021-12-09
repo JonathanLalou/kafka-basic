@@ -15,8 +15,8 @@ public class KafkaBasicController {
 
     @GetMapping("/hello")
     public String hello() throws Exception {
-        logger.info("GET hello");
-        return kafkaBasicEmitter.hello();
+        logger.info("GET /hello");
+        return kafkaBasicEmitter.sendMessagesToKafka().get();
     }
 
 }

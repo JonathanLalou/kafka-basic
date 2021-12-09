@@ -9,9 +9,16 @@ spring:
     bootstrap-servers: localhost:9092
   main:
     web-application-type: servlet
+  task:
+    execution:
+      pool:
+        core-size: 8
+        queue-capacity: 100
+
 # specific to current application
 tpd:
   topic-name: advice-topic
-  messages-per-request: 1000
+  messages-per-request: 10
+
 
 

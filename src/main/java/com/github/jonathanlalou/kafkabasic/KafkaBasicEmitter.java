@@ -4,9 +4,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
 @Service
@@ -27,24 +31,40 @@ public class KafkaBasicEmitter {
         this.messagePerRequest = messagesPerRequest;
     }
 
-    public String hello() throws Exception {
-        logger.info("GET hello");
+    @Async
+    public Future<String> sendMessagesToKafka() throws Exception {
+        logger.info("Starting `sendMessagesToKafka`");
         final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
         for (int i = 0; i < messagePerRequest; i++) {
-            logger.info("Sending #{}", i);
-            this.template.send(
-                    topicName
-                    , String.valueOf(i)
-                    , new Letter(
-                            'A'
-                            , 1, 1, 1, 1, 1, 1, i
-                    )
-            );
+            final int ii = i;
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    return sendOneMessage(countDownLatch, ii);
+                } catch (InterruptedException e) {
+                    logger.error("Could not send message for: " + ii, e);
+                    return null;
+                }
+            });
         }
-        //noinspection ResultOfMethodCallIgnored
+
         countDownLatch.await(1, TimeUnit.SECONDS);
         logger.info("All messages were sent");
-        return "hello world!";
+        return new AsyncResult<>("sendMessagesToKafka world!");
+    }
+
+    @Async
+    protected Future<Boolean> sendOneMessage(CountDownLatch countDownLatch, int i) throws InterruptedException {
+        logger.info("Sending #{}", i);
+        this.template.send(
+                topicName
+                , String.valueOf(i)
+                , new Letter(
+                        'A'
+                        , 1, 1, 1, 1, 1, 1, i
+                )
+        );
+        countDownLatch.await(5, TimeUnit.SECONDS);
+        return new AsyncResult<>(true);
     }
 
 }
