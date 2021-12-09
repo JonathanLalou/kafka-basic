@@ -7,8 +7,11 @@ spring:
       group-id: tpd-loggers
       auto-offset-reset: earliest
     bootstrap-servers: localhost:9092
-
+  main:
+    web-application-type: servlet
 # specific to current application
 tpd:
   topic-name: advice-topic
-  messages-per-request: 10
+  messages-per-request: 1000
+
+

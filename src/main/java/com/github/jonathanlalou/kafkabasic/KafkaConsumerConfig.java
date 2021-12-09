@@ -4,6 +4,7 @@ import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.Deserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,8 +14,10 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
+@ConditionalOnNotWebApplication
 public class KafkaConsumerConfig {
     public static final String KAFKA_LISTENER_OBJECT_CONTAINER_FACTORY = "kafkaListenerObjectContainerFactory";
+
     @Autowired
     private KafkaProperties kafkaProperties;
 
@@ -50,12 +53,12 @@ public class KafkaConsumerConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, byte[]> byteArrayConsumerFactory(Deserializer<String> stringDeserializer){
+    public ConsumerFactory<String, byte[]> byteArrayConsumerFactory(Deserializer<String> stringDeserializer) {
         return new DefaultKafkaConsumerFactory<>(kafkaProperties.buildConsumerProperties(), stringDeserializer, new ByteArrayDeserializer());
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerByteArrayContainerFactory(ConsumerFactory<String, byte[]> byteArrayConsumerFactory){
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerByteArrayContainerFactory(ConsumerFactory<String, byte[]> byteArrayConsumerFactory) {
         final ConcurrentKafkaListenerContainerFactory<String, byte[]> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(byteArrayConsumerFactory);
         return factory;
