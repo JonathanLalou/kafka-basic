@@ -1,5 +1,6 @@
-package com.github.jonathanlalou.kafkabasic;
+package com.github.jonathanlalou.kafkabasic.service;
 
+import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;

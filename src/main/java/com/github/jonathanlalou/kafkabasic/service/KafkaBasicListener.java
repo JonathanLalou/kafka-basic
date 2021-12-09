@@ -1,5 +1,7 @@
-package com.github.jonathanlalou.kafkabasic;
+package com.github.jonathanlalou.kafkabasic.service;
 
+import com.github.jonathanlalou.kafkabasic.config.KafkaConsumerConfig;
+import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;

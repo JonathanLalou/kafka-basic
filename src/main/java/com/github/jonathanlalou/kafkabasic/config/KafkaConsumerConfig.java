@@ -1,4 +1,4 @@
-package com.github.jonathanlalou.kafkabasic;
+package com.github.jonathanlalou.kafkabasic.config;
 
 import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.Deserializer;

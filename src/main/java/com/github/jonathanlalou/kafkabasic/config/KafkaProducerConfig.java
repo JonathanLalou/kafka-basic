@@ -1,4 +1,4 @@
-package com.github.jonathanlalou.kafkabasic;
+package com.github.jonathanlalou.kafkabasic.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;

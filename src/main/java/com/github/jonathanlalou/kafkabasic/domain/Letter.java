@@ -1,4 +1,4 @@
-package com.github.jonathanlalou.kafkabasic;
+package com.github.jonathanlalou.kafkabasic.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
