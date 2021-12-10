@@ -16,7 +16,8 @@ spring:
         queue-capacity: 100
   data:
     mongodb:
-      uri: mongodb+srv://ghardaia:ghardaia@localhost/myFirstDatabase?retryWrites=true&w=majority
+      uri: mongodb+srv://localhost/myFirstDatabase?retryWrites=true&w=majority
+#      uri: mongodb+srv://ghardaia:ghardaia@localhost/myFirstDatabase?retryWrites=true&w=majority
 
 # specific to current application
 tpd:
