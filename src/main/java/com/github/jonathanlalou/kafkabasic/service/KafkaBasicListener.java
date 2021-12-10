@@ -2,10 +2,14 @@ package com.github.jonathanlalou.kafkabasic.service;
 
 import com.github.jonathanlalou.kafkabasic.config.KafkaConsumerConfig;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
+import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -17,10 +21,15 @@ import java.util.stream.StreamSupport;
 
 @Component
 @ConditionalOnNotWebApplication
+@Getter
+@Setter
 public class KafkaBasicListener {
     private static final Logger logger = LoggerFactory.getLogger(KafkaBasicListener.class);
     @Value("${tpd.messages-per-request}")
     int messagesPerRequest;
+
+    @Autowired
+    private LetterRepository letterRepository;
 
     @KafkaListener(
             topics = "${tpd.topic-name}", clientIdPrefix = "json", containerFactory = KafkaConsumerConfig.KAFKA_LISTENER_OBJECT_CONTAINER_FACTORY
@@ -34,6 +43,7 @@ public class KafkaBasicListener {
                 , payload
                 , consumerRecord
         );
+        letterRepository.save(payload);
         countDownLatch.countDown();
     }
 

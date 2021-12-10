@@ -59,9 +59,10 @@ public class KafkaBasicEmitter {
         this.template.send(
                 topicName
                 , String.valueOf(i)
-                , new Letter(
+                , new Letter(i
+                        ,
                         'A'
-                        , 1, 1, 1, 1, 1, 1, i
+                        , 1, 1, 1, 1, 1, 1
                 )
         );
         countDownLatch.await(5, TimeUnit.SECONDS);

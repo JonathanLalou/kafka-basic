@@ -1,6 +1,6 @@
 package com.github.jonathanlalou.kafkabasic.repository;
 
-import com.github.jonathanlalou.kafkabasic.Letter;
+import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
