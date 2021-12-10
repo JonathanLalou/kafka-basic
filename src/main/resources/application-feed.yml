@@ -1,0 +1,4 @@
+# SpringBoot's properties available by default
+spring:
+  main:
+    web-application-type: none
