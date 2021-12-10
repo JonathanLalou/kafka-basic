@@ -32,6 +32,8 @@ public class Letter {
     private int chapterRank;
     @JsonProperty("verseRank")
     private int verseRank;
+    @JsonProperty("finalLetter")
+    private Boolean finalLetter;
 
 
 }
