@@ -62,7 +62,7 @@ public class KafkaBasicEmitter {
                 , new Letter(i
                         ,
                         'A'
-                        , 1, 1, 1, 1, 1, 1
+                        , 1, 1, 1, 1, 1, 1, false
                 )
         );
         countDownLatch.await(5, TimeUnit.SECONDS);

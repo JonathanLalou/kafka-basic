@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebAppli
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -15,6 +16,7 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 @Configuration
 @ConditionalOnNotWebApplication
+@Profile("consumer")
 public class KafkaConsumerConfig {
     public static final String KAFKA_LISTENER_OBJECT_CONTAINER_FACTORY = "kafkaListenerObjectContainerFactory";
 
