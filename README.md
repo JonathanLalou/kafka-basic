@@ -5,6 +5,10 @@
 * Profile `consumer` launches a consumer microservice. Several can be executed in parallel.
 * Server, producer and consumer should be split in different Maven artefacts, but for the moment we don't mind.
 
+# Target Macro-architecture
+
+cf ![Target Macro-architecture](./etc/ghardaia.png)
+
 # Kafka
 * Start ZooKeeper
 ```
