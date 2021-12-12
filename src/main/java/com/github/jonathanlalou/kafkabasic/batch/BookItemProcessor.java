@@ -1,4 +1,4 @@
-package com.github.jonathanlalou.kafkabasic.config;
+package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import lombok.extern.slf4j.Slf4j;
