@@ -1,6 +1,7 @@
 package com.github.jonathanlalou.kafkabasic.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jonathanlalou.kafkabasic.batch.FeedTasklet;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -35,9 +36,10 @@ public class BatchConfig {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
 
-    @Value("${file.input}")
-    private String fileInput;
+//    @Value("${file.input}")
+//    private String fileInput;
 
+/*
     @Bean
     @StepScope
     public JsonItemReader<Book> bookJsonItemReader() {
@@ -54,6 +56,7 @@ public class BatchConfig {
                 .build();
 
     }
+*/
 
     @Bean
     public ItemWriter<Book> bookItemWriter() {
@@ -82,6 +85,7 @@ public class BatchConfig {
 //        };
 //    }
 
+/*
     @Bean
     public Job importBookJob(
 //            JobCompletionNotificationListener listener,
@@ -107,5 +111,27 @@ public class BatchConfig {
                 .writer(bookItemWriter)
                 .build();
     }
+*/
 
+    @Bean
+    public Job job(
+            Step feedStep
+    ) {
+        return jobBuilderFactory
+                .get("taskletsJob")
+                .start(feedStep)
+//                .next(secondTasklet())
+//                .next(thirdTaslket())
+                .build();
+    }
+
+    @Bean
+    protected Step feedStep(
+            FeedTasklet feedTasklet
+    ) {
+        return stepBuilderFactory
+                .get("readLines")
+                .tasklet(feedTasklet)
+                .build();
+    }
 }
