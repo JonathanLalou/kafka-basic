@@ -24,7 +24,7 @@ tpd:
   topic-name: advice-topic
   messages-per-request: 10
 file:
-  input: 01.json
+  inputs: 01.json, 02.json, 03.json
 
 
 
