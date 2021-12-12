@@ -15,24 +15,25 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class Letter {
     @Id
-    @JsonProperty("absoluteRank")
+//    @JsonProperty("absoluteRank")
     private int absoluteRank;
 
-    @JsonProperty("character")
+//    @JsonProperty("character")
     private Character character;
-    @JsonProperty("book")
+    private Character heCharacter;
+//    @JsonProperty("book")
     private int book;
-    @JsonProperty("chapter")
+//    @JsonProperty("chapter")
     private int chapter;
-    @JsonProperty("verse")
+//    @JsonProperty("verse")
     private int verse;
-    @JsonProperty("bookRank")
+//    @JsonProperty("bookRank")
     private int bookRank;
-    @JsonProperty("chapterRank")
+//    @JsonProperty("chapterRank")
     private int chapterRank;
-    @JsonProperty("verseRank")
+//    @JsonProperty("verseRank")
     private int verseRank;
-    @JsonProperty("finalLetter")
+//    @JsonProperty("finalLetter")
     private Boolean finalLetter;
 
 
