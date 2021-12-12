@@ -60,8 +60,7 @@ public class KafkaBasicEmitter {
                 topicName
                 , String.valueOf(i)
                 , new Letter(i
-                        ,
-                        'A'
+                        ,'A','A'
                         , 1, 1, 1, 1, 1, 1, false
                 )
         );
