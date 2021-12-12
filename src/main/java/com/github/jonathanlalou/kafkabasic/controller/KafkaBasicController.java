@@ -30,7 +30,7 @@ public class KafkaBasicController {
     @ResponseBody
     public Letter letter() throws Exception {
         logger.info("GET /letter");
-        return letterRepository.save(new Letter(999, 'X', 1, 2, 3, 4, 5, 6, false));
+        return letterRepository.save(new Letter(999, 'X','X', 1, 2, 3, 4, 5, 6, false));
     }
 
 
