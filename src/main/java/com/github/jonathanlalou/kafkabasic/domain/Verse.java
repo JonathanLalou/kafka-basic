@@ -1,6 +1,6 @@
 package com.github.jonathanlalou.kafkabasic.domain;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -17,13 +16,14 @@ import java.util.List;
 @Data
 @Document
 @Builder
-public class Book {
+public class Verse {
     @Id
-    @JsonProperty("book")
-    private int book;
+//    @JsonProperty("verse")
+    private int verse;
 
+//    @JsonProperty("size")
     private int size;
 
-    private List<Chapter> chapters = new ArrayList<>();
-
+    @JsonIgnore
+    private String content;
 }

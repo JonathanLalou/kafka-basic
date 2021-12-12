@@ -1,6 +1,6 @@
 package com.github.jonathanlalou.kafkabasic.domain;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,13 +17,12 @@ import java.util.List;
 @Data
 @Document
 @Builder
-public class Book {
+public class Chapter {
     @Id
-    @JsonProperty("book")
-    private int book;
+    private int chapter;
 
     private int size;
 
-    private List<Chapter> chapters = new ArrayList<>();
+    private List<Verse> verses = new ArrayList<>();
 
 }
