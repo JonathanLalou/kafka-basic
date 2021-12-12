@@ -64,23 +64,23 @@ public class BatchConfig {
         };
     }
 
-    @Bean
-    public ItemProcessor<Book, Book> bookItemProcessor() {
-        return book -> {
-            System.out.println("In processor: " + book.toString().substring(0, 100));
-            System.out.println("book.getText().size(): " + book.getText().size());
-            final List<String> strings = book.getText().get(0);
-            for (int j = 0; j<3; j++) {
-                final String verse = strings.get(j);
-//            for (String verse : strings) {
-                for (int i = 0; i < verse.length(); i++) {
-                    System.out.println(verse.charAt(i));
-                }
-            }
-            System.out.println("book.getText().size(): " + strings);
-            return book;
-        };
-    }
+//    @Bean
+//    public ItemProcessor<Book, Book> bookItemProcessor() {
+//        return book -> {
+//            System.out.println("In processor: " + book.toString().substring(0, 100));
+//            System.out.println("book.getText().size(): " + book.getText().size());
+//            final List<String> strings = book.getText().get(0);
+//            for (int j = 0; j < 3; j++) {
+//                final String chapter = strings.get(j);
+////            for (String verse : strings) {
+//                for (int i = 0; i < chapter.length(); i++) {
+//                    System.out.println(chapter.charAt(i));
+//                }
+//            }
+//            System.out.println("book.getText().size(): " + strings);
+//            return book;
+//        };
+//    }
 
     @Bean
     public Job importBookJob(

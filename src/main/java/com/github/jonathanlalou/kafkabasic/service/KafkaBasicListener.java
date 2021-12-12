@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnNotWebApplication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
@@ -23,6 +24,7 @@ import java.util.stream.StreamSupport;
 @ConditionalOnNotWebApplication
 @Getter
 @Setter
+@Profile("!feed")
 public class KafkaBasicListener {
     private static final Logger logger = LoggerFactory.getLogger(KafkaBasicListener.class);
     @Value("${tpd.messages-per-request}")
