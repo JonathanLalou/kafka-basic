@@ -15,8 +15,10 @@ import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,11 +28,14 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
+@Component(JsonFileLoadTasklet.JSON_FILE_LOAD_TASKLET)
 @Slf4j
 @Getter
 @Setter
-public class FeedTasklet implements Tasklet, StepExecutionListener {
+@StepScope
+public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
+    public static final String JSON_FILE_LOAD_TASKLET = "JsonFileLoadTasklet";
+
     @Value("${file.inputs}")
     private String[] fileInputs;
 
@@ -41,14 +46,15 @@ public class FeedTasklet implements Tasklet, StepExecutionListener {
 
     private final String INPUT_FOLDER = "./src/main/resources/text/";
 
+    private List<Book> books = new ArrayList<>();
+    private List<Letter> letters = new ArrayList<>();
+
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         int bookRank = 1;
         int letterAbsoluteRank = 1;
         int chapterRank;
         int verseRank;
-        final List<Book> books = new ArrayList<>();
-        final List<Letter> letters = new ArrayList<>();
 
         for (String fileInput : fileInputs) {
             log.info("Handling file {}", fileInput);
@@ -66,8 +72,8 @@ public class FeedTasklet implements Tasklet, StepExecutionListener {
                     for (int i = 0; i < verseDTO.length(); ++i) {
                         final Character hebrewCharacter = verseDTO.charAt(i);
                         final Character latinCharacter = ghardaiaHelper.hebrew2Latin(hebrewCharacter);
-                        if (StringUtils.isBlank("" + latinCharacter)) { // TODO clean
-                            i--;
+                        if (null == latinCharacter) { // TODO clean
+                            // TODO handle the theoretically needed i--
                             continue;
                         }
                         final Boolean isFinal = ghardaiaHelper.isFinal(hebrewCharacter);
@@ -105,11 +111,16 @@ public class FeedTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        // TODO
+        // nothing to do on the first step of the job!
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
+        final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
+        executionContext.put("books", this.books);
+        executionContext.put("letters", this.letters);
+        log.debug("Step is completed and data was put into ExecutionContext");
+
         return ExitStatus.COMPLETED;
     }
 }
