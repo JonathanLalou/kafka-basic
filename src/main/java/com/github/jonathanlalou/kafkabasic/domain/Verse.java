@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.io.Serializable;
 import java.util.List;
 
 @NoArgsConstructor
@@ -16,12 +17,12 @@ import java.util.List;
 @Data
 @Document
 @Builder
-public class Verse {
+public class Verse implements Serializable {
     @Id
 //    @JsonProperty("verse")
     private int verse;
 
-//    @JsonProperty("size")
+    //    @JsonProperty("size")
     private int size;
 
     @JsonIgnore
