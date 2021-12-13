@@ -26,28 +26,6 @@ public class BatchConfig {
     @Autowired
     public StepBuilderFactory stepBuilderFactory;
 
-//    @Value("${file.input}")
-//    private String fileInput;
-
-/*
-    @Bean
-    @StepScope
-    public JsonItemReader<Book> bookJsonItemReader() {
-//        LOGGER.info(LOG_TEMPLATE, getClass().getSimpleName(), Thread.currentThread().getStackTrace()[1].getMethodName(), "Inside Reader...");
-
-        final ObjectMapper mapper = new ObjectMapper();
-
-        final JacksonJsonObjectReader<Book> jsonObjectReader = new JacksonJsonObjectReader<>(Book.class);
-        jsonObjectReader.setMapper(mapper);
-        return new JsonItemReaderBuilder<Book>()
-                .jsonObjectReader(jsonObjectReader)
-                .resource(new ClassPathResource(fileInput))
-                .name("bookJsonItemReader")
-                .build();
-
-    }
-*/
-
     @Bean
     public ItemWriter<Book> bookItemWriter() {
         return list -> {
@@ -56,52 +34,6 @@ public class BatchConfig {
             }
         };
     }
-
-//    @Bean
-//    public ItemProcessor<Book, Book> bookItemProcessor() {
-//        return book -> {
-//            System.out.println("In processor: " + book.toString().substring(0, 100));
-//            System.out.println("book.getText().size(): " + book.getText().size());
-//            final List<String> strings = book.getText().get(0);
-//            for (int j = 0; j < 3; j++) {
-//                final String chapter = strings.get(j);
-////            for (String verse : strings) {
-//                for (int i = 0; i < chapter.length(); i++) {
-//                    System.out.println(chapter.charAt(i));
-//                }
-//            }
-//            System.out.println("book.getText().size(): " + strings);
-//            return book;
-//        };
-//    }
-
-/*
-    @Bean
-    public Job importBookJob(
-//            JobCompletionNotificationListener listener,
-            Step step1) {
-        return jobBuilderFactory.get("importBookJob")
-                .incrementer(new RunIdIncrementer())
-//                .listener(listener)
-                .flow(step1)
-                .end()
-                .build();
-    }
-
-    @Bean
-    public Step step1(
-            ItemReader<Book> bookItemReader
-            , ItemProcessor<Book, Book> bookItemProcessor
-            , ItemWriter<Book> bookItemWriter
-    ) {
-        return stepBuilderFactory.get("step1")
-                .<Book, Book>chunk(10)
-                .reader(bookItemReader)
-                .processor(bookItemProcessor)
-                .writer(bookItemWriter)
-                .build();
-    }
-*/
 
     @Bean
     public Job job(
