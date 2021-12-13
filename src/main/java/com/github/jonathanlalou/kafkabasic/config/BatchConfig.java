@@ -1,29 +1,19 @@
 package com.github.jonathanlalou.kafkabasic.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.jonathanlalou.kafkabasic.batch.FeedTasklet;
+import com.github.jonathanlalou.kafkabasic.batch.GrossDataSendToKafkaTasklet;
+import com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepScope;
-import org.springframework.batch.core.launch.support.RunIdIncrementer;
-import org.springframework.batch.item.ItemProcessor;
-import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.json.JacksonJsonObjectReader;
-import org.springframework.batch.item.json.JsonItemReader;
-import org.springframework.batch.item.json.builder.JsonItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.core.io.ClassPathResource;
-
-import java.util.List;
 
 @Configuration
 @EnableBatchProcessing
@@ -115,23 +105,35 @@ public class BatchConfig {
 
     @Bean
     public Job job(
-            Step feedStep
+            @Qualifier("jsonFileLoadTaskletStep") Step jsonFileLoadTaskletStep
+            , @Qualifier("grossDataSendToKafkaTaskletStep") Step grossDataSendToKafkaTaskletStep
     ) {
         return jobBuilderFactory
                 .get("taskletsJob")
-                .start(feedStep)
-//                .next(secondTasklet())
-//                .next(thirdTaslket())
+                .start(jsonFileLoadTaskletStep)
+                .next(grossDataSendToKafkaTaskletStep)
+                // TODO 1/ create the list of equidistant letter strings
+                //      2/ send them to Kafka
                 .build();
     }
 
-    @Bean
-    protected Step feedStep(
-            FeedTasklet feedTasklet
+    @Bean("jsonFileLoadTaskletStep") // TODO extract constants
+    protected Step jsonFileLoadTaskletStep(
+            JsonFileLoadTasklet jsonFileLoadTasklet
     ) {
         return stepBuilderFactory
-                .get("readLines")
-                .tasklet(feedTasklet)
+                .get("jsonFileLoadTasklet")
+                .tasklet(jsonFileLoadTasklet)
+                .build();
+    }
+
+    @Bean("grossDataSendToKafkaTaskletStep") // TODO extract constants
+    protected Step grossDataSendToKafkaTaskletStep(
+            GrossDataSendToKafkaTasklet grossDataSendToKafkaTasklet
+    ) {
+        return stepBuilderFactory
+                .get("grossDataSendToKafkaTaskletStep")
+                .tasklet(grossDataSendToKafkaTasklet)
                 .build();
     }
 }

@@ -1,6 +1,7 @@
 package com.github.jonathanlalou.kafkabasic.service;
 
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,14 +10,16 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class KafkaBasicEmitter {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaBasicEmitter.class);
+//    private static final Logger logger = LoggerFactory.getLogger(KafkaBasicEmitter.class);
 
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
@@ -33,38 +36,35 @@ public class KafkaBasicEmitter {
     }
 
     @Async
-    public Future<String> sendMessagesToKafka() throws Exception {
-        logger.info("Starting `sendMessagesToKafka`");
+    public Future<String> sendMessagesToKafka(List<Letter> letters) throws Exception {
+        log.warn("Starting `sendMessagesToKafka`");
         final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
-        for (int i = 0; i < messagePerRequest; i++) {
-            final int ii = i;
+        for (Letter letter : letters) {
             CompletableFuture.supplyAsync(() -> {
                 try {
-                    return sendOneMessage(countDownLatch, ii);
+                    return sendOneMessage(letter, countDownLatch);
                 } catch (InterruptedException e) {
-                    logger.error("Could not send message for: " + ii, e);
+                    log.error("Could not send message for: #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter(), e);
                     return null;
                 }
             });
         }
 
         countDownLatch.await(1, TimeUnit.SECONDS);
-        logger.info("All messages were sent");
+        log.info("All messages were sent");
         return new AsyncResult<>("sendMessagesToKafka world!");
     }
 
     @Async
-    protected Future<Boolean> sendOneMessage(CountDownLatch countDownLatch, int i) throws InterruptedException {
-        logger.info("Sending #{}", i);
+    protected Future<Boolean> sendOneMessage(Letter letter, CountDownLatch countDownLatch) throws InterruptedException {
+        if (letter.getAbsoluteRank() % 1000 == 0)
+            log.warn("Sending #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter());
         this.template.send(
                 topicName
-                , String.valueOf(i)
-                , new Letter(i
-                        ,'A','A'
-                        , 1, 1, 1, 1, 1, 1, false
-                )
+                , String.valueOf(letter.getAbsoluteRank())
+                , letter
         );
-        countDownLatch.await(5, TimeUnit.SECONDS);
+        countDownLatch.await(5, TimeUnit.MILLISECONDS);
         return new AsyncResult<>(true);
     }
 

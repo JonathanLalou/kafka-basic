@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class KafkaBasicController {
     private static final Logger logger = LoggerFactory.getLogger(KafkaBasicController.class);
@@ -20,7 +22,7 @@ public class KafkaBasicController {
     @GetMapping("/hello")
     public String hello() throws Exception {
         logger.info("GET /hello");
-        return kafkaBasicEmitter.sendMessagesToKafka().get();
+        return kafkaBasicEmitter.sendMessagesToKafka(List.of()).get();
     }
 
     // DELETEME
