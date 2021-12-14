@@ -3,6 +3,7 @@ package com.github.jonathanlalou.kafkabasic.batch;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.EquidistantLetterSequence;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
+import com.github.jonathanlalou.kafkabasic.service.EquidistantLetterSequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +16,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -26,7 +28,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @Getter
 @Setter
-@StepScope // TODO rename as tasklet and extract the generator in a different component
+@StepScope
 public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepExecutionListener {
     public static final String EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_TASKLET = "equidistantLetterSequenceGeneratorTasklet";
 
@@ -34,6 +36,9 @@ public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepE
     private Integer minInterval;
     @Value("${equidistantLetterSequenceGenerator.maxInterval}")
     private Integer maxInterval;
+
+    @Autowired
+    private EquidistantLetterSequenceGenerator equidistantLetterSequenceGenerator;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
@@ -67,29 +72,9 @@ public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepE
         allLetters = letters.stream().map(it -> String.valueOf(it.getCharacter())).collect(Collectors.joining());
         log.info("Joined all letters: {}", allLetters.substring(0, 100));
 
-        equidistantLetterSequences = generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
+        equidistantLetterSequences = equidistantLetterSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
         return RepeatStatus.FINISHED;
     }
 
-    protected List<EquidistantLetterSequence> generateEquidistantLetterSequences(Integer _minInterval, Integer _maxInterval, String _allLetters) {
-        final List<EquidistantLetterSequence> answer = new ArrayList<>();
-        for (int interval = _minInterval; interval <= _maxInterval; interval++) {
-            for (int firstLetter = 0; firstLetter < interval; firstLetter++) {
-                final StringBuilder stringBuilder = new StringBuilder(_allLetters.length() / interval);
-                for (int j = firstLetter; /*j < allLetters.length() &&*/ (j + interval) < _allLetters.length(); j += interval) {
-                    stringBuilder.append(_allLetters.charAt(j));
-                }
-                final EquidistantLetterSequence equidistantLetterSequence = EquidistantLetterSequence
-                        .builder()
-                        .content(stringBuilder.toString())
-                        .interval(interval)
-                        .firstLetter(firstLetter + 1)
-                        .build();
-                log.debug("Added equidistantLetterSequence" + equidistantLetterSequence.toString().substring(0, 100));
-                answer.add(equidistantLetterSequence);
-            }
-        }
-        return answer;
-    }
 }
