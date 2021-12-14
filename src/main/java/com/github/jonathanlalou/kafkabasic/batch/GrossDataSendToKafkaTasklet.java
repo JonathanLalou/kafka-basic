@@ -35,7 +35,6 @@ public class GrossDataSendToKafkaTasklet implements Tasklet, StepExecutionListen
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
 
-
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         kafkaBasicEmitter.sendMessagesToKafka(this.letters);
