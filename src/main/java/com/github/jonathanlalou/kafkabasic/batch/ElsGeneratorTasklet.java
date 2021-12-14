@@ -1,9 +1,9 @@
 package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
-import com.github.jonathanlalou.kafkabasic.domain.EquidistantLetterSequence;
+import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.service.EquidistantLetterSequenceGenerator;
+import com.github.jonathanlalou.kafkabasic.service.ElsSequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -24,13 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component(EquidistantLetterSequenceGeneratorTasklet.EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_TASKLET)
+import static com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet.BOOKS;
+import static com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet.LETTERS;
+
+@Component(ElsGeneratorTasklet.ELS_GENERATOR_TASKLET)
 @Slf4j
 @Getter
 @Setter
 @StepScope
-public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepExecutionListener {
-    public static final String EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_TASKLET = "equidistantLetterSequenceGeneratorTasklet";
+public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
+    public static final String ELS_GENERATOR_TASKLET = "elsGeneratorTasklet";
+    public static final String EQUIDISTANT_LETTER_SEQUENCES = "equidistantLetterSequences";
 
     @Value("${equidistantLetterSequenceGenerator.minInterval}")
     private Integer minInterval;
@@ -38,13 +42,13 @@ public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepE
     private Integer maxInterval;
 
     @Autowired
-    private EquidistantLetterSequenceGenerator equidistantLetterSequenceGenerator;
+    private ElsSequenceGenerator elsSequenceGenerator;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
     private String allLetters;
 
-    private List<EquidistantLetterSequence> equidistantLetterSequences = new ArrayList<>();
+    private List<Els> equidistantLetterSequences = new ArrayList<>();
 
     @SuppressWarnings("unchecked")
     @Override
@@ -59,9 +63,9 @@ public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepE
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-        executionContext.put("books", this.books);
-        executionContext.put("letters", this.letters);
-        executionContext.put("equidistantLetterSequences", this.equidistantLetterSequences);
+        executionContext.put(BOOKS, this.books);
+        executionContext.put(LETTERS, this.letters);
+        executionContext.put(EQUIDISTANT_LETTER_SEQUENCES, this.equidistantLetterSequences);
         log.debug("Step is completed and data was put into ExecutionContext");
 
         return ExitStatus.COMPLETED;
@@ -72,7 +76,7 @@ public class EquidistantLetterSequenceGeneratorTasklet implements Tasklet, StepE
         allLetters = letters.stream().map(it -> String.valueOf(it.getCharacter())).collect(Collectors.joining());
         log.info("Joined all letters: {}", allLetters.substring(0, 100));
 
-        equidistantLetterSequences = equidistantLetterSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
+        equidistantLetterSequences = elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
         return RepeatStatus.FINISHED;
     }

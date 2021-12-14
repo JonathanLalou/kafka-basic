@@ -1,7 +1,7 @@
 package com.github.jonathanlalou.kafkabasic.service;
 
 
-import com.github.jonathanlalou.kafkabasic.domain.EquidistantLetterSequence;
+import com.github.jonathanlalou.kafkabasic.domain.Els;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.util.CollectionUtils;
@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class EquidistantLetterSequenceGeneratorTest {
+public class ElsSequenceGeneratorTest {
 
     private String allLetters = StringUtils.remove("""
                     AndwhatdoyouthinkofthislatestcomedythecoronationatMilanaskedAnnaPavlovnaandofthecomedyofthepeopleofGenoaandLuccalayingtheirpetitionsbefore
@@ -54,19 +54,19 @@ public class EquidistantLetterSequenceGeneratorTest {
                     """
             , '\n');
 
-    private EquidistantLetterSequenceGenerator equidistantLetterSequenceGenerator = new EquidistantLetterSequenceGenerator();
+    private ElsSequenceGenerator elsSequenceGenerator = new ElsSequenceGenerator();
     private int minInterval = 1;
     private int maxInterval = 100;
 
     @Test
     public void generateEquidistantLetterSequences() {
-        final List<EquidistantLetterSequence> actual = equidistantLetterSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
+        final List<Els> actual = elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
-        final EquidistantLetterSequence element0 = actual.get(0);
-        final EquidistantLetterSequence element1 = actual.get(1);
-        final EquidistantLetterSequence element2 = actual.get(2);
-        final EquidistantLetterSequence element3 = actual.get(3);
-        final EquidistantLetterSequence elementLast = CollectionUtils.lastElement(actual);
+        final Els element0 = actual.get(0);
+        final Els element1 = actual.get(1);
+        final Els element2 = actual.get(2);
+        final Els element3 = actual.get(3);
+        final Els elementLast = CollectionUtils.lastElement(actual);
 
         assertAll(
                 () -> assertEquals(allLetters, element0.getContent())

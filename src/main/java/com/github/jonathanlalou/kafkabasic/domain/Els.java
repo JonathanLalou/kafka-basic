@@ -9,12 +9,15 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
+/**
+ * "ELS" stands for "Equidistant Letter Sequence"
+ */
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Document
 @Builder
-public class EquidistantLetterSequence implements Serializable {
+public class Els implements Serializable {
     @Id
     private Integer id;
 
@@ -26,4 +29,8 @@ public class EquidistantLetterSequence implements Serializable {
     private Integer interval;
 
     private String content;
+
+    public String getKey() {
+        return interval + "-" + firstLetter;
+    }
 }
