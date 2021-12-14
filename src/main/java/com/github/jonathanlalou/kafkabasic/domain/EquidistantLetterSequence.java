@@ -8,20 +8,22 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @Document
 @Builder
-public class Chapter implements Serializable {
+public class EquidistantLetterSequence implements Serializable {
     @Id
-    private int chapter;
+    private Integer id;
 
-    private int size;
+    /**
+     * points to Letter.absoluteRank
+     */
+    private Integer firstLetter;
 
-    private List<Verse> verses = new ArrayList<>();
+    private Integer interval;
 
+    private String content;
 }
