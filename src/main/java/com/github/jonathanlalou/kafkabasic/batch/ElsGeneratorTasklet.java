@@ -54,8 +54,8 @@ public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
     @Override
     public void beforeStep(StepExecution stepExecution) {
         final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-        this.books = (List<Book>) executionContext.get("books");
-        this.letters = (List<Letter>) executionContext.get("letters");
+        this.books = (List<Book>) executionContext.get(BOOKS);
+        this.letters = (List<Letter>) executionContext.get(LETTERS);
         log.debug("Step is starting and data was retrieved from ExecutionContext");
 
     }

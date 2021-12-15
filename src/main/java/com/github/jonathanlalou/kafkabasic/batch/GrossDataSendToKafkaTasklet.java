@@ -38,15 +38,15 @@ public class GrossDataSendToKafkaTasklet implements Tasklet, StepExecutionListen
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         kafkaBasicEmitter.sendMessagesToKafka(this.letters);
-        return null;
+        return RepeatStatus.FINISHED;
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public void beforeStep(StepExecution stepExecution) {
         final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-        this.books = (List<Book>) executionContext.get("books");
-        this.letters = (List<Letter>) executionContext.get("letters");
+        this.books = (List<Book>) executionContext.get(JsonFileLoadTasklet.BOOKS);
+        this.letters = (List<Letter>) executionContext.get(JsonFileLoadTasklet.LETTERS);
         log.debug("Step is starting and data was retrieved from ExecutionContext");
 
     }
@@ -54,8 +54,8 @@ public class GrossDataSendToKafkaTasklet implements Tasklet, StepExecutionListen
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-        executionContext.put("books", this.books);
-        executionContext.put("letters", this.letters);
+        executionContext.put(JsonFileLoadTasklet.BOOKS, this.books);
+        executionContext.put(JsonFileLoadTasklet.LETTERS, this.letters);
         log.debug("Step is completed and data was put into ExecutionContext");
 
         return ExitStatus.COMPLETED;

@@ -35,6 +35,8 @@ import java.util.List;
 @StepScope
 public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
     public static final String JSON_FILE_LOAD_TASKLET = "JsonFileLoadTasklet";
+    public static final String BOOKS = "books";
+    public static final String LETTERS = "letters";
 
     @Value("${file.inputs}")
     private String[] fileInputs;
@@ -117,8 +119,8 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         final ExecutionContext executionContext = stepExecution.getJobExecution().getExecutionContext();
-        executionContext.put("books", this.books);
-        executionContext.put("letters", this.letters);
+        executionContext.put(BOOKS, this.books);
+        executionContext.put(LETTERS, this.letters);
         log.debug("Step is completed and data was put into ExecutionContext");
 
         return ExitStatus.COMPLETED;
