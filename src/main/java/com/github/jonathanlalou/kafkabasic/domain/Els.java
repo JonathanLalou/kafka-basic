@@ -19,7 +19,8 @@ import java.io.Serializable;
 @Builder
 public class Els implements Serializable {
     @Id
-    private Integer id;
+    private String id;
+    // TODO replace with a sequence-generated Integer
 
     /**
      * points to Letter.absoluteRank
@@ -30,7 +31,7 @@ public class Els implements Serializable {
 
     private String content;
 
-    public String getKey() {
-        return interval + "-" + firstLetter;
-    }
+//    public String getKey() {
+//        return interval + "-" + firstLetter;
+//    }
 }
