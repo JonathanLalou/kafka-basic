@@ -7,6 +7,7 @@ import com.github.jonathanlalou.kafkabasic.service.ElsSequenceGenerator;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FileUtils;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -20,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +78,7 @@ public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         allLetters = letters.stream().map(it -> String.valueOf(it.getCharacter())).collect(Collectors.joining());
         log.info("Joined all letters: {}", allLetters.substring(0, 100));
+        FileUtils.writeStringToFile(new File(JsonFileLoadTasklet.INPUT_FOLDER + "allLetters.txt"), allLetters, Charset.defaultCharset());
 
         equidistantLetterSequences = elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
