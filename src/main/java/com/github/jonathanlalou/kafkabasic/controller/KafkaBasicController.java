@@ -45,6 +45,7 @@ public class KafkaBasicController {
     @ResponseBody
     public List<Els> letter(@RequestParam String word) throws Exception {
         log.info("GET /search/{}", word);
+        // TODO search for the reversed word
         return elsRepository.findByContentContains(word);
     }
 

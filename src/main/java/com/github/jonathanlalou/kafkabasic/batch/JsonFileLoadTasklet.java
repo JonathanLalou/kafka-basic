@@ -46,13 +46,14 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
     private final Gson gson = new Gson();
 
-    private final String INPUT_FOLDER = "./src/main/resources/text/";
+    protected static final String INPUT_FOLDER = "./src/main/resources/text/";
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        // TODO extract in a Component
         int bookRank = 1;
         int letterAbsoluteRank = 1;
         int chapterRankInBook;
@@ -61,8 +62,8 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
         for (String fileInput : fileInputs) {
             log.info("Handling file {}", fileInput);
             final String json = IOUtils.toString(new FileReader(INPUT_FOLDER + fileInput));
-            final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
 
+            final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
             final Book book = new Book();
             chapterRankInBook = 1;
             for (List<String> chapterDTOs : bookDTO.getText()) {
@@ -102,7 +103,7 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
             book.setBook(bookRank);
             books.add(book);
             bookRank++;
-            log.warn("Book {} has {} chapters, {} verses ; total number of letters until now: {}."
+            log.info("Book {} has {} chapters, {} verses ; total number of letters until now: {}."
                     , bookDTO.getTitle()
                     , book.getChapters().size()
                     , book.getChapters().stream().mapToInt(it -> it.getVerses().size()).sum()

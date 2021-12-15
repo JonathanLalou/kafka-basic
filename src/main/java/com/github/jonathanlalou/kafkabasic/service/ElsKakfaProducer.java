@@ -34,7 +34,7 @@ public class ElsKakfaProducer {
 
     @Async
     public Future<String> sendElsesToKafka(List<Els> elses) throws Exception {
-        log.warn("Starting `sendMessagesToKafka`");
+        log.warn("Starting `sendLettersToKafka`");
         final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
         for (Els els : elses) {
             CompletableFuture.supplyAsync(() -> {
@@ -49,7 +49,7 @@ public class ElsKakfaProducer {
 
         countDownLatch.await(1, TimeUnit.SECONDS);
         log.info("All messages were sent");
-        return new AsyncResult<>("sendMessagesToKafka world!");
+        return new AsyncResult<>("sendLettersToKafka world!");
     }
 
     @Async

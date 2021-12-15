@@ -2,7 +2,7 @@ package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.service.KafkaBasicEmitter;
+import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -21,23 +21,23 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component(GrossDataSendToKafkaTasklet.GROSS_DATA_SEND_TO_KAFKA_TASKLET)
+@Component(LetterSendToKafkaTasklet.LETTER_SEND_TO_KAFKA_TASKLET)
 @Slf4j
 @Getter
 @Setter
 @StepScope
-public class GrossDataSendToKafkaTasklet implements Tasklet, StepExecutionListener {
-    public static final String GROSS_DATA_SEND_TO_KAFKA_TASKLET = "GrossDataSendToKafkaTasklet";
+public class LetterSendToKafkaTasklet implements Tasklet, StepExecutionListener {
+    public static final String LETTER_SEND_TO_KAFKA_TASKLET = "letterSendToKafkaTasklet";
 
     @Autowired
-    private KafkaBasicEmitter kafkaBasicEmitter;
+    private LetterKafkaProducer letterKafkaProducer;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        kafkaBasicEmitter.sendMessagesToKafka(this.letters);
+        letterKafkaProducer.sendLettersToKafka(this.letters);
         return RepeatStatus.FINISHED;
     }
 
