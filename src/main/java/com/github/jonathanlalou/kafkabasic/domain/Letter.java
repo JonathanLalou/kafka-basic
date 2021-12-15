@@ -35,6 +35,10 @@ public class Letter implements Serializable {
     private int chapterRank;
     //    @JsonProperty("verseRank")
     private int verseRank;
+    /**
+     * Rank of this letter in the current verse
+     */
+    private int letterRank;
     //    @JsonProperty("finalLetter")
     private Boolean finalLetter;
 

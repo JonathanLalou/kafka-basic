@@ -55,8 +55,8 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         int bookRank = 1;
         int letterAbsoluteRank = 1;
-        int chapterRank;
-        int verseRank;
+        int chapterRankInBook;
+        int verseRankInChapter;
 
         for (String fileInput : fileInputs) {
             log.info("Handling file {}", fileInput);
@@ -64,25 +64,26 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
             final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
 
             final Book book = new Book();
-            chapterRank = 1;
+            chapterRankInBook = 1;
             for (List<String> chapterDTOs : bookDTO.getText()) {
                 final Chapter chapter = new Chapter();
-                chapter.setChapter(chapterRank);
-                verseRank = 1;
+                chapter.setChapter(chapterRankInBook);
+                verseRankInChapter = 1;
                 for (String verseDTO : chapterDTOs) {
-                    chapter.getVerses().add(new Verse(verseRank, verseDTO.length(), verseDTO));
-                    for (int i = 0; i < verseDTO.length(); ++i) {
-                        final Character hebrewCharacter = verseDTO.charAt(i);
+                    chapter.getVerses().add(new Verse(verseRankInChapter, verseDTO.length(), verseDTO));
+                    for (int letterRankInVerse = 0; letterRankInVerse < verseDTO.length(); ++letterRankInVerse) {
+                        final Character hebrewCharacter = verseDTO.charAt(letterRankInVerse);
                         final Character latinCharacter = ghardaiaHelper.hebrew2Latin(hebrewCharacter);
                         if (null == latinCharacter) { // TODO clean
-                            // TODO handle the theoretically needed i--
+                            // TODO handle the theoretically needed letterRankInVerse--
                             continue;
                         }
                         final Boolean isFinal = ghardaiaHelper.isFinal(hebrewCharacter);
                         letters.add(Letter.builder()
                                 .book(bookRank)
-                                .chapter(chapterRank)
-                                .verse(verseRank)
+                                .chapter(chapterRankInBook)
+                                .verse(verseRankInChapter)
+                                .letterRank(letterRankInVerse + 1)
                                 .absoluteRank(letterAbsoluteRank)
                                 .character(latinCharacter)
                                 .heCharacter(hebrewCharacter)
@@ -92,10 +93,10 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
                         letterAbsoluteRank++;
                     }
 
-                    verseRank++;
+                    verseRankInChapter++;
                 }
-                chapter.setSize(verseRank);
-                chapterRank++;
+                chapter.setSize(verseRankInChapter);
+                chapterRankInBook++;
                 book.getChapters().add(chapter);
             }
             book.setBook(bookRank);

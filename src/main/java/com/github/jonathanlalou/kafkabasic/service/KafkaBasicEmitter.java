@@ -55,8 +55,9 @@ public class KafkaBasicEmitter {
 
     @Async
     protected Future<Boolean> sendOneMessage(Letter letter, CountDownLatch countDownLatch) throws InterruptedException {
-        if (letter.getAbsoluteRank() % 1000 == 0)
-            log.warn("Sending #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter());
+        if (letter.getAbsoluteRank() % 10000 == 0) {
+            log.info("Sending #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter());
+        }
         this.template.send(
                 topicName
                 , String.valueOf(letter.getAbsoluteRank())
@@ -88,8 +89,9 @@ public class KafkaBasicEmitter {
 
     @Async
     protected Future<Boolean> sendOneEls(Els els, CountDownLatch countDownLatch) throws InterruptedException {
-        if (els.getFirstLetter() % 1000 == 0)
+        if (els.getFirstLetter() % 10000 == 0) {
             log.warn("Sending #{}", els.getKey());
+        }
         this.template.send(
                 topicName
                 , String.valueOf(els.getKey())

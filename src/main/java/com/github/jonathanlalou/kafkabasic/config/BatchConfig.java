@@ -43,8 +43,6 @@ public class BatchConfig {
                 .next(grossDataSendToKafkaTaskletStep)
                 .next(elsGeneratorStep)
                 .next(elsSendToKafkaStep)
-                // TODO 1/ create the list of equidistant letter strings
-                //      2/ send them to Kafka
                 .build();
     }
 
