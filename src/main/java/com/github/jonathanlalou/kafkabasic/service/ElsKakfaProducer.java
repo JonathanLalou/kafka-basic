@@ -17,16 +17,16 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class KafkaBasicEmitter {
+public class ElsKakfaProducer {
 
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
     private final int messagePerRequest;
 
-    public KafkaBasicEmitter(
+    public ElsKakfaProducer(
             final KafkaTemplate<String, Object> template
-            , @Value("${letters.topic-name}") final String topicName
-            , @Value("${letters.messages-per-request}") final int messagesPerRequest
+            , @Value("${els.topic-name}") final String topicName
+            , @Value("${els.messages-per-request}") final int messagesPerRequest
     ) {
         this.template = template;
         this.topicName = topicName;
@@ -34,15 +34,15 @@ public class KafkaBasicEmitter {
     }
 
     @Async
-    public Future<String> sendMessagesToKafka(List<Letter> letters) throws Exception {
+    public Future<String> sendElsesToKafka(List<Els> elses) throws Exception {
         log.warn("Starting `sendMessagesToKafka`");
         final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
-        for (Letter letter : letters) {
+        for (Els els : elses) {
             CompletableFuture.supplyAsync(() -> {
                 try {
-                    return sendOneMessage(letter, countDownLatch);
+                    return sendOneEls(els, countDownLatch);
                 } catch (InterruptedException e) {
-                    log.error("Could not send message for: #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter(), e);
+                    log.error("Could not send message for: #{}", els.getId(), e);
                     return null;
                 }
             });
@@ -54,14 +54,14 @@ public class KafkaBasicEmitter {
     }
 
     @Async
-    protected Future<Boolean> sendOneMessage(Letter letter, CountDownLatch countDownLatch) throws InterruptedException {
-        if (letter.getAbsoluteRank() % 10000 == 0) {
-            log.info("Sending #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter());
+    protected Future<Boolean> sendOneEls(Els els, CountDownLatch countDownLatch) throws InterruptedException {
+        if (els.getFirstLetter() % 10000 == 0) {
+            log.warn("Sending #{}", els.getId());
         }
         this.template.send(
                 topicName
-                , String.valueOf(letter.getAbsoluteRank())
-                , letter
+                , els.getId()
+                , els
         );
         countDownLatch.await(5, TimeUnit.MILLISECONDS);
         return new AsyncResult<>(true);
