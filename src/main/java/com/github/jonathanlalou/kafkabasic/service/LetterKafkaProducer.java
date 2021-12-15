@@ -17,13 +17,13 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class KafkaBasicEmitter {
+public class LetterKafkaProducer {
 
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
     private final int messagePerRequest;
 
-    public KafkaBasicEmitter(
+    public LetterKafkaProducer(
             final KafkaTemplate<String, Object> template
             , @Value("${letters.topic-name}") final String topicName
             , @Value("${letters.messages-per-request}") final int messagesPerRequest
