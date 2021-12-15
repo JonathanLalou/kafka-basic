@@ -1,15 +1,14 @@
 package com.github.jonathanlalou.kafkabasic.config;
 
-import com.github.jonathanlalou.kafkabasic.batch.EquidistantLetterSequenceGeneratorTasklet;
+import com.github.jonathanlalou.kafkabasic.batch.ElsGeneratorTasklet;
+import com.github.jonathanlalou.kafkabasic.batch.ElsSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.GrossDataSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet;
-import com.github.jonathanlalou.kafkabasic.domain.Book;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
-import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -23,7 +22,8 @@ import org.springframework.context.annotation.Profile;
 public class BatchConfig {
     public static final String JSON_FILE_LOAD_TASKLET_STEP = "jsonFileLoadTaskletStep";
     public static final String GROSS_DATA_SEND_TO_KAFKA_TASKLET_STEP = "grossDataSendToKafkaTaskletStep";
-    public static final String EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_STEP = "equidistantLetterSequenceGeneratorStep";
+    public static final String ELS_GENERATOR_STEP = "elsGeneratorStep";
+    public static final String ELS_SEND_TO_KAFKA_STEP = "ElsSendToKafkaStep";
     @Autowired
     public JobBuilderFactory jobBuilderFactory;
 
@@ -31,31 +31,24 @@ public class BatchConfig {
     public StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public ItemWriter<Book> bookItemWriter() {
-        return list -> {
-            for (Book book : list) {
-                System.out.println("Writer: " + book.toString().substring(0, 100));
-            }
-        };
-    }
-
-    @Bean
     public Job job(
             @Qualifier(JSON_FILE_LOAD_TASKLET_STEP) Step jsonFileLoadTaskletStep
             , @Qualifier(GROSS_DATA_SEND_TO_KAFKA_TASKLET_STEP) Step grossDataSendToKafkaTaskletStep
-            , @Qualifier(EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_STEP) Step equidistantLetterSequences
+            , @Qualifier(ELS_GENERATOR_STEP) Step elsGeneratorStep
+            , @Qualifier(ELS_SEND_TO_KAFKA_STEP) Step elsSendToKafkaStep
     ) {
         return jobBuilderFactory
                 .get("taskletsJob")
                 .start(jsonFileLoadTaskletStep)
                 .next(grossDataSendToKafkaTaskletStep)
-                .next(equidistantLetterSequences)
+                .next(elsGeneratorStep)
+                .next(elsSendToKafkaStep)
                 // TODO 1/ create the list of equidistant letter strings
                 //      2/ send them to Kafka
                 .build();
     }
 
-    @Bean(JSON_FILE_LOAD_TASKLET_STEP) // TODO extract constants
+    @Bean(JSON_FILE_LOAD_TASKLET_STEP)
     protected Step jsonFileLoadTaskletStep(
             JsonFileLoadTasklet jsonFileLoadTasklet
     ) {
@@ -65,7 +58,7 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean(GROSS_DATA_SEND_TO_KAFKA_TASKLET_STEP) // TODO extract constants
+    @Bean(GROSS_DATA_SEND_TO_KAFKA_TASKLET_STEP)
     protected Step grossDataSendToKafkaTaskletStep(
             GrossDataSendToKafkaTasklet grossDataSendToKafkaTasklet
     ) {
@@ -75,13 +68,23 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean(EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_STEP) // TODO extract constants
+    @Bean(ELS_GENERATOR_STEP)
     protected Step equidistantLetterSequenceGeneratorStep(
-            EquidistantLetterSequenceGeneratorTasklet equidistantLetterSequenceGeneratorTasklet
+            ElsGeneratorTasklet elsGeneratorTasklet
     ) {
         return stepBuilderFactory
-                .get(EQUIDISTANT_LETTER_SEQUENCE_GENERATOR_STEP)
-                .tasklet(equidistantLetterSequenceGeneratorTasklet)
+                .get(ELS_GENERATOR_STEP)
+                .tasklet(elsGeneratorTasklet)
+                .build();
+    }
+
+    @Bean(ELS_SEND_TO_KAFKA_STEP)
+    protected Step equidistantLetterSequenceSendToKafkaStep(
+            ElsSendToKafkaTasklet elsSendToKafkaTasklet
+    ) {
+        return stepBuilderFactory
+                .get(ELS_SEND_TO_KAFKA_STEP)
+                .tasklet(elsSendToKafkaTasklet)
                 .build();
     }
 }
