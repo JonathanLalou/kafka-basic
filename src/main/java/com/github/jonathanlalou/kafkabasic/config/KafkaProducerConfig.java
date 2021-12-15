@@ -26,6 +26,12 @@ public class KafkaProducerConfig {
     @Value("${tpd.topic-name}")
     private String topicName;
 
+    @Value("${letters.topic-name}")
+    private String lettersTopicName;
+
+    @Value("${els.topic-name}")
+    private String elsTopicName;
+
     @Bean
     public Executor asyncExecutor(
             @Value("${spring.task.execution.pool.core-size}") final Integer corePoolSize
@@ -63,6 +69,16 @@ public class KafkaProducerConfig {
     @Bean
     public NewTopic adviceTopic() {
         return new NewTopic(topicName, 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic lettersTopic() {
+        return new NewTopic(lettersTopicName, 3, (short) 1);
+    }
+
+    @Bean
+    public NewTopic elsTopic() {
+        return new NewTopic(elsTopicName, 3, (short) 1);
     }
 
 }

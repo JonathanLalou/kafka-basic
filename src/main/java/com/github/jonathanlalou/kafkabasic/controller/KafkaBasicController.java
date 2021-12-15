@@ -28,11 +28,12 @@ public class KafkaBasicController {
     // DELETEME
     @Autowired
     private LetterRepository letterRepository;
+
     @GetMapping("/letter")
     @ResponseBody
     public Letter letter() throws Exception {
         logger.info("GET /letter");
-        return letterRepository.save(new Letter(999, 'X','X', 1, 2, 3, 4, 5, 6, false));
+        return letterRepository.save(new Letter(999, 'X', 'X', 1, 2, 3, 4, 5, 6, 7, false));
     }
 
 

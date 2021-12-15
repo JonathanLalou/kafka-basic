@@ -3,7 +3,7 @@ package com.github.jonathanlalou.kafkabasic.batch;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.service.KafkaBasicEmitter;
+import com.github.jonathanlalou.kafkabasic.service.ElsKakfaProducer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class ElsSendToKafkaTasklet implements Tasklet, StepExecutionListener {
     public static final String ELS_SEND_TO_KAFKA_TASKLET = "ElsSendToKafkaTasklet";
 
     @Autowired
-    private KafkaBasicEmitter kafkaBasicEmitter;
+    private ElsKakfaProducer elsKakfaProducer;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
@@ -43,7 +43,7 @@ public class ElsSendToKafkaTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        kafkaBasicEmitter.sendElsesToKafka(this.elses);
+        elsKakfaProducer.sendElsesToKafka(this.elses);
         return RepeatStatus.FINISHED;
     }
 

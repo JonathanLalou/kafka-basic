@@ -27,6 +27,7 @@ public class ElsSequenceGenerator {
                         .content(stringBuilder.toString())
                         .interval(interval)
                         .firstLetter(firstLetter + 1)
+                        .id(interval + "-" + (firstLetter + 1))
                         .build();
                 log.debug("Added equidistantLetterSequence" + equidistantLetterSequence.toString().substring(0, 100));
                 answer.add(equidistantLetterSequence);

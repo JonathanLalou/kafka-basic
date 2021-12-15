@@ -23,11 +23,19 @@ spring:
 tpd:
   topic-name: advice-topic
   messages-per-request: 10
+letters:
+  topic-name: letters
+  messages-per-request: 10
+els:
+  topic-name: els
+  messages-per-request: 10
 file:
-  inputs: 01.json, 02.json, 03.json
+#  inputs: 01.json, 02.json
+  inputs: 01.json, 02.json, 03.json, 04.json, 05.json
 equidistantLetterSequenceGenerator:
   minInterval: 1
   maxInterval: 100
+#  maxInterval: 100
 
 
 
