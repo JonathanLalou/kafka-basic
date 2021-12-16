@@ -16,13 +16,13 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
-public class ElsKakfaProducer {
+public class ElsKafkaProducer {
 
     private final KafkaTemplate<String, Object> template;
     private final String topicName;
     private final int messagePerRequest;
 
-    public ElsKakfaProducer(
+    public ElsKafkaProducer(
             final KafkaTemplate<String, Object> template
             , @Value("${els.topic-name}") final String topicName
             , @Value("${els.messages-per-request}") final int messagesPerRequest
@@ -35,27 +35,37 @@ public class ElsKakfaProducer {
     @Async
     public Future<String> sendElsesToKafka(List<Els> elses) throws Exception {
         log.warn("Starting `sendLettersToKafka`");
-        final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
+
         for (Els els : elses) {
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    return sendOneEls(els, countDownLatch);
-                } catch (InterruptedException e) {
-                    log.error("Could not send message for: #{}", els.getId(), e);
-                    return null;
-                }
-            });
+            sendOneElsToKafka(els);
         }
 
-        countDownLatch.await(1, TimeUnit.SECONDS);
+//        countDownLatch.await(1, TimeUnit.SECONDS);
         log.info("All messages were sent");
         return new AsyncResult<>("sendLettersToKafka world!");
     }
 
     @Async
+    public void sendOneElsToKafka(Els els) {
+        final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
+        CompletableFuture.supplyAsync(() -> {
+            try {
+//                sendOneEls(els, countDownLatch);
+                return sendOneEls(els, countDownLatch);
+            } catch (InterruptedException e) {
+                log.error("Could not send message for: #{}", els.getId(), e);
+                return null;
+            }
+        });
+    }
+
+    @Async
     protected Future<Boolean> sendOneEls(Els els, CountDownLatch countDownLatch) throws InterruptedException {
+//        if (els.getFirstLetter() % 100 == 0) {
+//            System.gc();
+//        }
         if (els.getFirstLetter() % 10000 == 0) {
-            log.warn("Sending #{}", els.getId());
+            log.warn("Sending ELS with id: {}", els.getId());
         }
         this.template.send(
                 topicName

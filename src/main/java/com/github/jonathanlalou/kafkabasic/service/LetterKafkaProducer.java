@@ -1,6 +1,5 @@
 package com.github.jonathanlalou.kafkabasic.service;
 
-import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,21 +35,32 @@ public class LetterKafkaProducer {
     @Async
     public Future<String> sendLettersToKafka(List<Letter> letters) throws Exception {
         log.warn("Starting `sendLettersToKafka`");
-        final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
         for (Letter letter : letters) {
-            CompletableFuture.supplyAsync(() -> {
-                try {
-                    return sendOneMessage(letter, countDownLatch);
-                } catch (InterruptedException e) {
-                    log.error("Could not send message for: #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter(), e);
-                    return null;
-                }
-            });
+            sendOneLetterToKafka(letter);
         }
 
-        countDownLatch.await(1, TimeUnit.SECONDS);
+//        countDownLatch.await(1, TimeUnit.SECONDS);
         log.info("All messages were sent");
         return new AsyncResult<>("sendLettersToKafka world!");
+    }
+
+    @Async
+    public void sendOneLetterToKafka(Letter letter) {
+        final CountDownLatch countDownLatch = new CountDownLatch(messagePerRequest);
+        CompletableFuture.supplyAsync(() -> {
+            try {
+                return sendOneMessage(letter, countDownLatch);
+            } catch (InterruptedException e) {
+                log.error("Could not send message for: #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter(), e);
+                return null;
+            }
+        });
+        try {
+            sendOneMessage(letter, countDownLatch);
+        } catch (InterruptedException e) {
+            log.error("Could not send message for: #{}: {} / {}", letter.getAbsoluteRank(), letter.getHeCharacter(), letter.getCharacter(), e);
+        }
+
     }
 
     @Async
