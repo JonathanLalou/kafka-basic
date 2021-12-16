@@ -50,7 +50,7 @@ public class GhardaiaCleaningTasklet implements Tasklet, StepExecutionListener {
     protected static final String INPUT_FOLDER = "./src/main/resources/text/";
 
     @PostConstruct
-    public void postConstruct(){
+    public void postConstruct() {
         Assert.notNull(letterRepository, "letterRepository cannot be null");
         Assert.notNull(elsRepository, "elsRepository cannot be null");
     }
@@ -61,6 +61,16 @@ public class GhardaiaCleaningTasklet implements Tasklet, StepExecutionListener {
             log.info("Cleaning all...");
             letterRepository.deleteAll();
             elsRepository.deleteAll();
+            if (letterRepository.count() == 0L) {
+                log.info("Letters were purged ✅");
+            } else {
+                log.warn("Letters were NOT purged ❌");
+            }
+            if (elsRepository.count() == 0L) {
+                log.info("ELSes were purged ✅");
+            } else {
+                log.warn("ELSes were NOT purged ❌");
+            }
             // TODO purge Kafka topics
         } else {
             log.info("Won't clean...");
