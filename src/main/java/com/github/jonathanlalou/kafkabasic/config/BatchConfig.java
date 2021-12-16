@@ -3,7 +3,6 @@ package com.github.jonathanlalou.kafkabasic.config;
 import com.github.jonathanlalou.kafkabasic.batch.ElsGeneratorTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.ElsSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.GhardaiaCleaningTasklet;
-import com.github.jonathanlalou.kafkabasic.batch.LetterSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -35,7 +34,6 @@ public class BatchConfig {
     @Bean
     public Job job(
             @Qualifier(JSON_FILE_LOAD_TASKLET_STEP) Step jsonFileLoadTaskletStep
-            , @Qualifier(LETTER_SEND_TO_KAFKA_STEP) Step letterSendToKafkaStep
             , @Qualifier(ELS_GENERATOR_STEP) Step elsGeneratorStep
             , @Qualifier(ELS_SEND_TO_KAFKA_STEP) Step elsSendToKafkaStep
 //            , @Qualifier(GHARDAIA_CLEANING_STEP) Step ghardaiaCleaningStep
@@ -49,7 +47,6 @@ public class BatchConfig {
                         .build()
                 )
                 .next(jsonFileLoadTaskletStep)
-                .next(letterSendToKafkaStep)
                 .next(elsGeneratorStep)
                 .next(elsSendToKafkaStep)
                 .build();
@@ -65,15 +62,6 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean(LETTER_SEND_TO_KAFKA_STEP)
-    protected Step grossDataSendToKafkaTaskletStep(
-            LetterSendToKafkaTasklet letterSendToKafkaTasklet
-    ) {
-        return stepBuilderFactory
-                .get(LETTER_SEND_TO_KAFKA_STEP)
-                .tasklet(letterSendToKafkaTasklet)
-                .build();
-    }
 
     @Bean(ELS_GENERATOR_STEP)
     protected Step equidistantLetterSequenceGeneratorStep(
