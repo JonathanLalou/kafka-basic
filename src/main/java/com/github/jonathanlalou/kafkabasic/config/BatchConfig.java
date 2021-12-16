@@ -38,11 +38,16 @@ public class BatchConfig {
             , @Qualifier(LETTER_SEND_TO_KAFKA_STEP) Step letterSendToKafkaStep
             , @Qualifier(ELS_GENERATOR_STEP) Step elsGeneratorStep
             , @Qualifier(ELS_SEND_TO_KAFKA_STEP) Step elsSendToKafkaStep
-            , @Qualifier(GHARDAIA_CLEANING_STEP) Step ghardaiaCleaningStep
+//            , @Qualifier(GHARDAIA_CLEANING_STEP) Step ghardaiaCleaningStep
+            , GhardaiaCleaningTasklet ghardaiaCleaningTasklet
     ) {
         return jobBuilderFactory
                 .get("taskletsJob")
-                .start(ghardaiaCleaningStep)
+                .start(stepBuilderFactory
+                        .get(GHARDAIA_CLEANING_STEP)
+                        .tasklet(ghardaiaCleaningTasklet)
+                        .build()
+                )
                 .next(jsonFileLoadTaskletStep)
                 .next(letterSendToKafkaStep)
                 .next(elsGeneratorStep)
@@ -90,13 +95,13 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean(GHARDAIA_CLEANING_STEP)
-    protected Step ghardaiaCleaningStep(
-            GhardaiaCleaningTasklet ghardaiaCleaningTasklet
-    ) {
-        return stepBuilderFactory
-                .get(GHARDAIA_CLEANING_STEP)
-                .tasklet(ghardaiaCleaningTasklet)
-                .build();
-    }
+//    @Bean(GHARDAIA_CLEANING_STEP)
+//    protected Step ghardaiaCleaningStep(
+//            GhardaiaCleaningTasklet ghardaiaCleaningTasklet
+//    ) {
+//        return stepBuilderFactory
+//                .get(GHARDAIA_CLEANING_STEP)
+//                .tasklet(ghardaiaCleaningTasklet)
+//                .build();
+//    }
 }
