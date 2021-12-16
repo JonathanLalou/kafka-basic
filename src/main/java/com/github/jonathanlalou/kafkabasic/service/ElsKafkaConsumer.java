@@ -38,13 +38,15 @@ public class ElsKafkaConsumer {
     )
     public void listenAsObject(ConsumerRecord<String, Els> consumerRecord, @Payload Els payload) {
         final CountDownLatch countDownLatch = new CountDownLatch(messagesPerRequest);
-        log.info(
-                "Logger 1 [JSON] received key {}: Type [{}] | Payload: {} | Record {}"
-                , consumerRecord.key()
-                , typeIdHeader(consumerRecord.headers())
-                , payload
-                , consumerRecord
-        );
+        if (0 == payload.getFirstLetter() % 10000) {
+            log.info(
+                    "Logger 1 [JSON] received key {}: Type [{}] | Payload: {} | Record {}"
+                    , consumerRecord.key()
+                    , typeIdHeader(consumerRecord.headers())
+                    , payload
+                    , consumerRecord
+            );
+        }
         elsRepository.save(payload);
         countDownLatch.countDown();
     }
