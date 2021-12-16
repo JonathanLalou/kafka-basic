@@ -1,16 +1,12 @@
 package com.github.jonathanlalou.kafkabasic.controller;
 
 import com.github.jonathanlalou.kafkabasic.domain.Els;
-import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
-import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,7 +39,7 @@ public class KafkaBasicController {
 
     @GetMapping("/search/{word}")
     @ResponseBody
-    public List<Els> letter(@RequestParam String word) throws Exception {
+    public List<Els> letter(@PathVariable("word") String word) throws Exception {
         log.info("GET /search/{}", word);
         // TODO search for the reversed word
         return elsRepository.findByContentContains(word);

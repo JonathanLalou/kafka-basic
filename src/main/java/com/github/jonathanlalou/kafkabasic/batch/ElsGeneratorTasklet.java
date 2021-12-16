@@ -82,7 +82,7 @@ public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
         }
         FileUtils.writeStringToFile(new File(JsonFileLoadTasklet.INPUT_FOLDER + "allLetters.txt"), allLetters, Charset.defaultCharset());
 
-        equidistantLetterSequences = elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
+        elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
         return RepeatStatus.FINISHED;
     }

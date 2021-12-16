@@ -3,7 +3,8 @@ package com.github.jonathanlalou.kafkabasic.batch;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.service.ElsKakfaProducer;
+import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
+import com.github.jonathanlalou.kafkabasic.service.ElsKafkaProducer;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,9 @@ public class ElsSendToKafkaTasklet implements Tasklet, StepExecutionListener {
     public static final String ELS_SEND_TO_KAFKA_TASKLET = "ElsSendToKafkaTasklet";
 
     @Autowired
-    private ElsKakfaProducer elsKakfaProducer;
+    private ElsKafkaProducer elsKafkaProducer;
+    @Autowired
+    private ElsRepository elsRepository;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
@@ -43,7 +46,13 @@ public class ElsSendToKafkaTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        elsKakfaProducer.sendElsesToKafka(this.elses);
+        log.warn("This step WON'T do anything");
+/*
+        log.info("About to send {} ELSes to Kafka", this.elses.size());
+//        elsKakfaProducer.sendElsesToKafka(this.elses);
+        elsRepository.saveAll(this.elses);
+        log.info("There are currently {} ELSes in DB", elsRepository.count());
+*/
         return RepeatStatus.FINISHED;
     }
 

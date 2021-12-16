@@ -54,7 +54,7 @@ public class ElsSequenceGeneratorTest {
                     """
             , '\n');
 
-    private ElsSequenceGenerator elsSequenceGenerator = new ElsSequenceGenerator();
+    private ElsSequenceGenerator elsSequenceGenerator = ElsSequenceGenerator.builder().persistElses(true).build();
     private int minInterval = 1;
     private int maxInterval = 100;
 

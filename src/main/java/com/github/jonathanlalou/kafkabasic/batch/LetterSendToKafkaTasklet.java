@@ -2,6 +2,7 @@ package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
+import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
 import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.List;
 
+// DELETEME
 @Component(LetterSendToKafkaTasklet.LETTER_SEND_TO_KAFKA_TASKLET)
 @Slf4j
 @Getter
@@ -31,13 +33,21 @@ public class LetterSendToKafkaTasklet implements Tasklet, StepExecutionListener 
 
     @Autowired
     private LetterKafkaProducer letterKafkaProducer;
+    @Autowired
+    private LetterRepository letterRepository;
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        letterKafkaProducer.sendLettersToKafka(this.letters);
+        log.warn("This step WON'T do anything");
+/*
+        log.info("About to send {} Letters to Kafka", this.letters.size());
+//        letterRepository.saveAll(this.letters);
+//        letterKafkaProducer.sendLettersToKafka(this.letters);
+        log.info("There are currently {} Letters in DB", letterRepository.count());
+*/
         return RepeatStatus.FINISHED;
     }
 

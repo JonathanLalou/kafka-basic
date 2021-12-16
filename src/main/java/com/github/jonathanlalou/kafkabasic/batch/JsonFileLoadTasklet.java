@@ -5,12 +5,13 @@ import com.github.jonathanlalou.kafkabasic.domain.BookDTO;
 import com.github.jonathanlalou.kafkabasic.domain.Chapter;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.domain.Verse;
+import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
+import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -43,6 +44,10 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
     @Autowired
     private GhardaiaHelper ghardaiaHelper;
+    @Autowired
+    private LetterRepository letterRepository;
+    @Autowired
+    private LetterKafkaProducer letterKafkaProducer;
 
     private final Gson gson = new Gson();
 
@@ -80,7 +85,18 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
                             continue;
                         }
                         final Boolean isFinal = ghardaiaHelper.isFinal(hebrewCharacter);
-                        letters.add(Letter.builder()
+//                        letterRepository.save(Letter.builder()
+//                                .book(bookRank)
+//                                .chapter(chapterRankInBook)
+//                                .verse(verseRankInChapter)
+//                                .letterRank(letterRankInVerse + 1)
+//                                .absoluteRank(letterAbsoluteRank)
+//                                .character(latinCharacter)
+//                                .heCharacter(hebrewCharacter)
+//                                .finalLetter(isFinal)
+//                                .build()
+//                        );
+                        final Letter letter = Letter.builder()
                                 .book(bookRank)
                                 .chapter(chapterRankInBook)
                                 .verse(verseRankInChapter)
@@ -89,8 +105,9 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
                                 .character(latinCharacter)
                                 .heCharacter(hebrewCharacter)
                                 .finalLetter(isFinal)
-                                .build()
-                        );
+                                .build();
+                        letterKafkaProducer.sendOneLetterToKafka(letter);
+                        letters.add(letter);
                         letterAbsoluteRank++;
                     }
 

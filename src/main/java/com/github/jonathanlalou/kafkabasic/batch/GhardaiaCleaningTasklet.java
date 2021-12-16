@@ -59,13 +59,15 @@ public class GhardaiaCleaningTasklet implements Tasklet, StepExecutionListener {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         if (cleaning) {
             log.info("Cleaning all...");
+
             letterRepository.deleteAll();
-            elsRepository.deleteAll();
             if (letterRepository.count() == 0L) {
                 log.info("Letters were purged ✅");
             } else {
                 log.warn("Letters were NOT purged ❌");
             }
+
+            elsRepository.deleteAll();
             if (elsRepository.count() == 0L) {
                 log.info("ELSes were purged ✅");
             } else {
