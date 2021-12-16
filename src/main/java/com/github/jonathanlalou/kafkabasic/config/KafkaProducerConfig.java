@@ -17,6 +17,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
+import java.util.concurrent.RejectedExecutionException;
 
 @Configuration
 public class KafkaProducerConfig {
@@ -43,6 +44,21 @@ public class KafkaProducerConfig {
         executor.setMaxPoolSize(maxPoolSize);
         executor.setQueueCapacity(queueCapacity);
         executor.setThreadNamePrefix("Async-");
+        /*
+        Fixes error:
+        ```
+        org.springframework.core.task.TaskRejectedException: Executor [java.util.concurrent.ThreadPoolExecutor@d701f70[Running, pool size = 8, active threads = 8, queued tasks = 100, completed tasks = 0]] did not accept task: org.springframework.aop.interceptor.AsyncExecutionInterceptor$$Lambda$1098/0x00000008010f0ad8@b86abe5
+        ```
+        Source: https://stackoverflow.com/questions/49290054/
+        */
+        executor.setRejectedExecutionHandler((runnable, threadPoolExecutor) -> {
+            try {
+                threadPoolExecutor.getQueue().put(runnable);
+            } catch (InterruptedException e) {
+                throw new RejectedExecutionException("There was an unexpected InterruptedException whilst waiting to add a Runnable in the executor's blocking queue", e);
+            }
+        });
+
         executor.initialize();
         return executor;
     }
