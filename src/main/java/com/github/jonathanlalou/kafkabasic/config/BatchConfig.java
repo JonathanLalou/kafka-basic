@@ -1,7 +1,6 @@
 package com.github.jonathanlalou.kafkabasic.config;
 
 import com.github.jonathanlalou.kafkabasic.batch.ElsGeneratorTasklet;
-import com.github.jonathanlalou.kafkabasic.batch.ElsSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.GhardaiaCleaningTasklet;
 import com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet;
 import org.springframework.batch.core.Job;
@@ -21,7 +20,6 @@ import org.springframework.context.annotation.Profile;
 @Profile("feed")
 public class BatchConfig {
     public static final String JSON_FILE_LOAD_TASKLET_STEP = "jsonFileLoadTaskletStep";
-    public static final String LETTER_SEND_TO_KAFKA_STEP = "letterSendToKafkaStep";
     public static final String ELS_GENERATOR_STEP = "elsGeneratorStep";
     public static final String ELS_SEND_TO_KAFKA_STEP = "ElsSendToKafkaStep";
     public static final String GHARDAIA_CLEANING_STEP = "ghardaiaCleaningStep";
@@ -35,8 +33,6 @@ public class BatchConfig {
     public Job job(
             @Qualifier(JSON_FILE_LOAD_TASKLET_STEP) Step jsonFileLoadTaskletStep
             , @Qualifier(ELS_GENERATOR_STEP) Step elsGeneratorStep
-            , @Qualifier(ELS_SEND_TO_KAFKA_STEP) Step elsSendToKafkaStep
-//            , @Qualifier(GHARDAIA_CLEANING_STEP) Step ghardaiaCleaningStep
             , GhardaiaCleaningTasklet ghardaiaCleaningTasklet
     ) {
         return jobBuilderFactory
@@ -48,7 +44,6 @@ public class BatchConfig {
                 )
                 .next(jsonFileLoadTaskletStep)
                 .next(elsGeneratorStep)
-                .next(elsSendToKafkaStep)
                 .build();
     }
 
@@ -73,23 +68,5 @@ public class BatchConfig {
                 .build();
     }
 
-    @Bean(ELS_SEND_TO_KAFKA_STEP)
-    protected Step equidistantLetterSequenceSendToKafkaStep(
-            ElsSendToKafkaTasklet elsSendToKafkaTasklet
-    ) {
-        return stepBuilderFactory
-                .get(ELS_SEND_TO_KAFKA_STEP)
-                .tasklet(elsSendToKafkaTasklet)
-                .build();
-    }
 
-//    @Bean(GHARDAIA_CLEANING_STEP)
-//    protected Step ghardaiaCleaningStep(
-//            GhardaiaCleaningTasklet ghardaiaCleaningTasklet
-//    ) {
-//        return stepBuilderFactory
-//                .get(GHARDAIA_CLEANING_STEP)
-//                .tasklet(ghardaiaCleaningTasklet)
-//                .build();
-//    }
 }
