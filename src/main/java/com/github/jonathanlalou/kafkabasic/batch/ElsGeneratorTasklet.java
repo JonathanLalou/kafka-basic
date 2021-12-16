@@ -77,7 +77,9 @@ public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         allLetters = letters.stream().map(it -> String.valueOf(it.getCharacter())).collect(Collectors.joining());
-        log.info("Joined all letters: {}", allLetters.substring(0, 100));
+        if (allLetters.length() > 0) {
+            log.info("Joined all letters: {}", allLetters.substring(0, 100));
+        }
         FileUtils.writeStringToFile(new File(JsonFileLoadTasklet.INPUT_FOLDER + "allLetters.txt"), allLetters, Charset.defaultCharset());
 
         equidistantLetterSequences = elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
