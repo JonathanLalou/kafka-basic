@@ -3,6 +3,7 @@ package com.github.jonathanlalou.kafkabasic.service;
 import com.github.jonathanlalou.kafkabasic.domain.Els;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
@@ -14,6 +15,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+@Lazy
 @Slf4j
 @Service
 public class ElsKafkaProducer {

@@ -3,6 +3,7 @@ package com.github.jonathanlalou.kafkabasic.batch;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.BookDTO;
 import com.github.jonathanlalou.kafkabasic.domain.Chapter;
+import com.github.jonathanlalou.kafkabasic.domain.GhardaiaPersistenceMode;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.domain.Verse;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
@@ -23,11 +24,14 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Component(JsonFileLoadTasklet.JSON_FILE_LOAD_TASKLET)
 @Slf4j
@@ -41,11 +45,17 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
     @Value("${file.inputs}")
     private String[] fileInputs;
+    @Value("${ghardaia.persistence.mode}")
+    private GhardaiaPersistenceMode persistenceMode;
+    @Value("${ghardaia.persistence.pageSize}")
+    private Integer pageSize;
 
     @Autowired
     private GhardaiaHelper ghardaiaHelper;
     @Autowired
     private LetterRepository letterRepository;
+
+    @Lazy
     @Autowired
     private LetterKafkaProducer letterKafkaProducer;
 
@@ -70,6 +80,7 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
             final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
             final Book book = new Book();
+            final Set<Letter> setOfLetters = new HashSet<>(pageSize);
             chapterRankInBook = 1;
             for (List<String> chapterDTOs : bookDTO.getText()) {
                 final Chapter chapter = new Chapter();
@@ -85,17 +96,6 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
                             continue;
                         }
                         final Boolean isFinal = ghardaiaHelper.isFinal(hebrewCharacter);
-//                        letterRepository.save(Letter.builder()
-//                                .book(bookRank)
-//                                .chapter(chapterRankInBook)
-//                                .verse(verseRankInChapter)
-//                                .letterRank(letterRankInVerse + 1)
-//                                .absoluteRank(letterAbsoluteRank)
-//                                .character(latinCharacter)
-//                                .heCharacter(hebrewCharacter)
-//                                .finalLetter(isFinal)
-//                                .build()
-//                        );
                         final Letter letter = Letter.builder()
                                 .book(bookRank)
                                 .chapter(chapterRankInBook)
@@ -106,7 +106,18 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
                                 .heCharacter(hebrewCharacter)
                                 .finalLetter(isFinal)
                                 .build();
-                        letterKafkaProducer.sendOneLetterToKafka(letter);
+                        if (persistenceMode == GhardaiaPersistenceMode.SYNCHRONOUS) {
+                            setOfLetters.add(letter);
+                            /* Regularly, save a set of entities. It is more efficient to save 1 time 100 entities, than to save 100 times 1 entity ;-).
+                            We don't save all the entities at one time, in order to avoid an OutOfMemory error.
+                            * */
+                            if (0 == setOfLetters.size() % pageSize) {
+                                letterRepository.saveAll(setOfLetters);
+                                setOfLetters.clear();
+                            }
+                        } else {
+                            letterKafkaProducer.sendOneLetterToKafka(letter);
+                        }
                         letters.add(letter);
                         letterAbsoluteRank++;
                     }

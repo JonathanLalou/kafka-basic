@@ -37,5 +37,8 @@ equidistantLetterSequenceGenerator:
 #  maxInterval: 100
 ghardaia:
   cleaning: true
+  persistence:
+    pageSize: 100
+    mode: SYNCHRONOUS
 
 
