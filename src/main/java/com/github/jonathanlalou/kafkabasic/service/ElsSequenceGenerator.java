@@ -1,6 +1,5 @@
 package com.github.jonathanlalou.kafkabasic.service;
 
-import com.github.jonathanlalou.kafkabasic.batch.ElsSendToKafkaTasklet;
 import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
 import lombok.AllArgsConstructor;
@@ -14,8 +13,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
-import java.text.ChoiceFormat;
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,7 +53,7 @@ public class ElsSequenceGenerator {
                         .content(stringBuilder.toString())
                         .interval(interval)
                         .firstLetter(firstLetter + 1)
-                        .id(String.format("%04d", interval) + "-" + String.format("%02d", firstLetter + 1))
+                        .id(String.format("%04d", interval) + "-" + String.format("%04d", firstLetter + 1))
                         .build();
                 log.debug("Added equidistantLetterSequence" + equidistantLetterSequence.toString().substring(0, 100));
 //                answer.add(equidistantLetterSequence);         // DELETEME

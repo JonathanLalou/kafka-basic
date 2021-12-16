@@ -2,11 +2,11 @@ package com.github.jonathanlalou.kafkabasic.service;
 
 import com.github.jonathanlalou.kafkabasic.config.KafkaConsumerConfig;
 import com.github.jonathanlalou.kafkabasic.domain.Els;
-import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.header.Headers;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +43,7 @@ public class ElsKafkaConsumer {
                     "Logger 1 [JSON] received key {}: Type [{}] | Payload: {} | Record {}"
                     , consumerRecord.key()
                     , typeIdHeader(consumerRecord.headers())
-                    , payload
+                    , StringUtils.substring(payload.toString(), 0, 100)
                     , consumerRecord
             );
         }
