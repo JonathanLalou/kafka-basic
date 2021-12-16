@@ -69,6 +69,14 @@ public class KafkaProducerConfig {
         final Map<String, Object> producerConfigs = new HashMap<>(kafkaProperties.buildProducerProperties());
         producerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         producerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        /*
+        Fixes error:
+        ```
+        org.apache.kafka.common.errors.RecordTooLargeException: The message is 1203697 bytes when serialized which is larger than 1048576, which is the value of the max.request.size configuration.
+        ```
+        By default, the value is 1MB ; the full Tanach is 1_203_486 characters. Let's increase the limit + take in account the serialization.
+         * */
+        producerConfigs.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, 1_210_000);
         return producerConfigs;
     }
 
