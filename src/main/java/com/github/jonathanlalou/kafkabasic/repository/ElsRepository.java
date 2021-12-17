@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ElsRepository extends MongoRepository<Els, Integer> {
-    List<Els> findByContentContains(String word);
+    List<Els> findTop3ByContentContainsOrderByInterval(String word);
 }

@@ -13,4 +13,5 @@ public class WordSearchResult {
     Integer firstLetter;
     Integer firstLetterRank;
     List<Triple<String, Character, String>> enclosings;
+    List<String> verses;
 }

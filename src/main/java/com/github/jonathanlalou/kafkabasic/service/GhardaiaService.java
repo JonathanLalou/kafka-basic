@@ -3,29 +3,38 @@ package com.github.jonathanlalou.kafkabasic.service;
 import com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper;
 import com.github.jonathanlalou.kafkabasic.domain.Book;
 import com.github.jonathanlalou.kafkabasic.domain.Chapter;
+import com.github.jonathanlalou.kafkabasic.domain.Els;
 import com.github.jonathanlalou.kafkabasic.domain.GhardaiaPersistenceMode;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.domain.Verse;
 import com.github.jonathanlalou.kafkabasic.dto.BookDTO;
 import com.github.jonathanlalou.kafkabasic.dto.JsonBookLoadingResult;
+import com.github.jonathanlalou.kafkabasic.dto.WordSearchResult;
 import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
 import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.apache.commons.lang3.tuple.Triple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @Slf4j
@@ -33,6 +42,7 @@ import java.util.Set;
 @Setter
 @Profile("web")
 public class GhardaiaService {
+    private final int range = 20;
     @Autowired
     private ElsRepository elsRepository;
     @Autowired
@@ -50,7 +60,7 @@ public class GhardaiaService {
     private final Gson gson = new Gson();
 
     @PostConstruct
-    public void postConstruct(){
+    public void postConstruct() {
         Assert.notNull(elsRepository, "elsRepository cannot be null");
         Assert.notNull(letterRepository, "letterRepository cannot be null");
     }
@@ -112,8 +122,6 @@ public class GhardaiaService {
             book.getChapters().add(chapter);
         }
         book.setBook(bookRank);
-//        books.add(book);
-//            bookRank++;
         log.info("Book {} has {} chapters, {} verses ; total number of letters until now: {}."
                 , bookDTO.getTitle()
                 , book.getChapters().size()
@@ -124,8 +132,49 @@ public class GhardaiaService {
     }
 
 
-
+    public List<WordSearchResult> search(String word) {
 //    public List<WordSearchResult> search(String word){
-//
-//    }
+        final List<WordSearchResult> wordSearchResults = new ArrayList<>();
+        final List<Els> elses = elsRepository.findTop3ByContentContainsOrderByInterval(word);
+        for (Els els : elses.subList(0, 3)) {
+            final String content = els.getContent();
+            final int index = StringUtils.indexOf(content, word);
+            log.info("index of {} in ELS: {}", word, index);
+            log.info("Substring (should be same as the searched word): {}", content.substring(index, index + word.length()));
+            final List<Triple<String, Character, String>> enclosings = new ArrayList<>();
+            final List<String> verses = new ArrayList<>();
+            for (int i = 0; i < word.length(); i++) {
+                final int currentLetterAbsoluteRank = els.getFirstLetter() + ((index + i) * els.getInterval());
+                final Letter letter = letterRepository.findById(currentLetterAbsoluteRank).orElse(new Letter()); // TODO clean
+                log.info("Letter: {}", letter);
+
+                // TODO call an external API, such as Sefaria
+                final String left = String.join("",
+                        letterRepository
+                                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank - range, currentLetterAbsoluteRank).boxed().toList())
+                                .stream()
+                                .map(it -> String.valueOf(it.getHeCharacter()))
+                                .collect(Collectors.toList())
+                );
+                final String right = String.join("",
+                        letterRepository
+                                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank + 1, currentLetterAbsoluteRank + range).boxed().toList())
+                                .stream()
+                                .map(it -> String.valueOf(it.getHeCharacter()))
+                                .collect(Collectors.toList())
+                );
+                enclosings.add(new ImmutableTriple<>(left, letter.getHeCharacter(), right));
+
+            }
+            wordSearchResults.add(WordSearchResult
+                    .builder()
+                    .firstLetter(els.getFirstLetter())
+                    .interval(els.getInterval())
+                    .firstLetterRank(index)
+                    .enclosings(enclosings)
+                    .build()
+            );
+        }
+        return wordSearchResults;
+    }
 }
