@@ -1,17 +1,10 @@
 package com.github.jonathanlalou.kafkabasic.batch;
 
-import com.github.jonathanlalou.kafkabasic.domain.Book;
-import com.github.jonathanlalou.kafkabasic.domain.BookDTO;
-import com.github.jonathanlalou.kafkabasic.domain.Chapter;
-import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.domain.Verse;
 import com.github.jonathanlalou.kafkabasic.repository.ElsRepository;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
-import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -19,7 +12,6 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,9 +19,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import javax.annotation.PostConstruct;
-import java.io.FileReader;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component(GhardaiaCleaningTasklet.GHARDAIA_CLEANING_TASKLET)
 @Slf4j

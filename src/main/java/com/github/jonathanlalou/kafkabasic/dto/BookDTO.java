@@ -1,4 +1,4 @@
-package com.github.jonathanlalou.kafkabasic.domain;
+package com.github.jonathanlalou.kafkabasic.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +11,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@Document
 @Builder
 public class BookDTO {
     private String status;

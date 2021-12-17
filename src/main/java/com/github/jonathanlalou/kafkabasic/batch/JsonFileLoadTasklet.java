@@ -1,12 +1,14 @@
 package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
-import com.github.jonathanlalou.kafkabasic.domain.BookDTO;
 import com.github.jonathanlalou.kafkabasic.domain.Chapter;
 import com.github.jonathanlalou.kafkabasic.domain.GhardaiaPersistenceMode;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
 import com.github.jonathanlalou.kafkabasic.domain.Verse;
+import com.github.jonathanlalou.kafkabasic.dto.BookDTO;
+import com.github.jonathanlalou.kafkabasic.dto.JsonBookLoadingResult;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
+import com.github.jonathanlalou.kafkabasic.service.GhardaiaService;
 import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
 import com.google.gson.Gson;
 import lombok.Getter;
@@ -45,21 +47,18 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
     @Value("${file.inputs}")
     private String[] fileInputs;
-    @Value("${ghardaia.persistence.mode}")
-    private GhardaiaPersistenceMode persistenceMode;
-    @Value("${ghardaia.persistence.pageSize}")
-    private Integer pageSize;
 
-    @Autowired
-    private GhardaiaHelper ghardaiaHelper;
+//    @Autowired
+//    private GhardaiaHelper ghardaiaHelper;
     @Autowired
     private LetterRepository letterRepository;
-
-    @Lazy
     @Autowired
-    private LetterKafkaProducer letterKafkaProducer;
+    private GhardaiaService ghardaiaService;
 
-    private final Gson gson = new Gson();
+//    @Lazy
+//    @Autowired
+//    private LetterKafkaProducer letterKafkaProducer;
+
 
     protected static final String INPUT_FOLDER = "./src/main/resources/text/";
 
@@ -68,78 +67,20 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        // TODO extract in a Component
-        int bookRank = 1;
         int letterAbsoluteRank = 1;
-        int chapterRankInBook;
-        int verseRankInChapter;
-
-        for (String fileInput : fileInputs) {
+        JsonBookLoadingResult jsonBookLoadingResult = new JsonBookLoadingResult(letterAbsoluteRank, null, null);
+        for (int bookRank = 1; bookRank < fileInputs.length; bookRank++) {
+            final String fileInput = fileInputs[bookRank];
             log.info("Handling file {}", fileInput);
             final String json = IOUtils.toString(new FileReader(INPUT_FOLDER + fileInput));
 
-            final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
-            final Book book = new Book();
-            final Set<Letter> setOfLetters = new HashSet<>(pageSize);
-            chapterRankInBook = 1;
-            for (List<String> chapterDTOs : bookDTO.getText()) {
-                final Chapter chapter = new Chapter();
-                chapter.setChapter(chapterRankInBook);
-                verseRankInChapter = 1;
-                for (String verseDTO : chapterDTOs) {
-                    chapter.getVerses().add(new Verse(verseRankInChapter, verseDTO.length(), verseDTO));
-                    for (int letterRankInVerse = 0; letterRankInVerse < verseDTO.length(); ++letterRankInVerse) {
-                        final Character hebrewCharacter = verseDTO.charAt(letterRankInVerse);
-                        final Character latinCharacter = ghardaiaHelper.hebrew2Latin(hebrewCharacter);
-                        if (null == latinCharacter) { // TODO clean
-                            // TODO handle the theoretically needed letterRankInVerse--
-                            continue;
-                        }
-                        final Boolean isFinal = ghardaiaHelper.isFinal(hebrewCharacter);
-                        final Letter letter = Letter.builder()
-                                .book(bookRank)
-                                .chapter(chapterRankInBook)
-                                .verse(verseRankInChapter)
-                                .letterRank(letterRankInVerse + 1)
-                                .absoluteRank(letterAbsoluteRank)
-                                .character(latinCharacter)
-                                .heCharacter(hebrewCharacter)
-                                .finalLetter(isFinal)
-                                .build();
-                        if (persistenceMode == GhardaiaPersistenceMode.SYNCHRONOUS) {
-                            setOfLetters.add(letter);
-                            /* Regularly, save a set of entities. It is more efficient to save 1 time 100 entities, than to save 100 times 1 entity ;-).
-                            We don't save all the entities at one time, in order to avoid an OutOfMemory error.
-                            * */
-                            if (0 == setOfLetters.size() % pageSize) {
-                                letterRepository.saveAll(setOfLetters);
-                                setOfLetters.clear();
-                            }
-                        } else {
-                            letterKafkaProducer.sendOneLetterToKafka(letter);
-                        }
-                        letters.add(letter);
-                        letterAbsoluteRank++;
-                    }
-
-                    verseRankInChapter++;
-                }
-                chapter.setSize(verseRankInChapter);
-                chapterRankInBook++;
-                book.getChapters().add(chapter);
-            }
-            book.setBook(bookRank);
-            books.add(book);
-            bookRank++;
-            log.info("Book {} has {} chapters, {} verses ; total number of letters until now: {}."
-                    , bookDTO.getTitle()
-                    , book.getChapters().size()
-                    , book.getChapters().stream().mapToInt(it -> it.getVerses().size()).sum()
-                    , letters.size()
-            );
+            jsonBookLoadingResult = ghardaiaService.processOneJsonBook(json, bookRank, jsonBookLoadingResult.getLetterAbsoluteRank());
+            books.add(jsonBookLoadingResult.getBook());
+            letters.addAll(jsonBookLoadingResult.getLetters());
         }
         return RepeatStatus.FINISHED;
     }
+
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
