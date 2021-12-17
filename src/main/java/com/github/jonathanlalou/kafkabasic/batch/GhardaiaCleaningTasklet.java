@@ -36,8 +36,6 @@ public class GhardaiaCleaningTasklet implements Tasklet, StepExecutionListener {
     @Autowired
     private ElsRepository elsRepository;
 
-    protected static final String INPUT_FOLDER = "./src/main/resources/text/";
-
     @PostConstruct
     public void postConstruct() {
         Assert.notNull(letterRepository, "letterRepository cannot be null");

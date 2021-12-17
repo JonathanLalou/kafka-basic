@@ -1,16 +1,10 @@
 package com.github.jonathanlalou.kafkabasic.batch;
 
 import com.github.jonathanlalou.kafkabasic.domain.Book;
-import com.github.jonathanlalou.kafkabasic.domain.Chapter;
-import com.github.jonathanlalou.kafkabasic.domain.GhardaiaPersistenceMode;
 import com.github.jonathanlalou.kafkabasic.domain.Letter;
-import com.github.jonathanlalou.kafkabasic.domain.Verse;
-import com.github.jonathanlalou.kafkabasic.dto.BookDTO;
 import com.github.jonathanlalou.kafkabasic.dto.JsonBookLoadingResult;
 import com.github.jonathanlalou.kafkabasic.repository.LetterRepository;
 import com.github.jonathanlalou.kafkabasic.service.GhardaiaService;
-import com.github.jonathanlalou.kafkabasic.service.LetterKafkaProducer;
-import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,14 +20,13 @@ import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+
+import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOLDER;
 
 @Component(JsonFileLoadTasklet.JSON_FILE_LOAD_TASKLET)
 @Slf4j
@@ -48,19 +41,10 @@ public class JsonFileLoadTasklet implements Tasklet, StepExecutionListener {
     @Value("${file.inputs}")
     private String[] fileInputs;
 
-//    @Autowired
-//    private GhardaiaHelper ghardaiaHelper;
     @Autowired
     private LetterRepository letterRepository;
     @Autowired
     private GhardaiaService ghardaiaService;
-
-//    @Lazy
-//    @Autowired
-//    private LetterKafkaProducer letterKafkaProducer;
-
-
-    protected static final String INPUT_FOLDER = "./src/main/resources/text/";
 
     private List<Book> books = new ArrayList<>();
     private List<Letter> letters = new ArrayList<>();

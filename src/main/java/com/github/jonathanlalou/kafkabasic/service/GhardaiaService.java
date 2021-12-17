@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -25,16 +26,18 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOLDER;
 
 @Service
 @Slf4j
@@ -131,9 +134,7 @@ public class GhardaiaService {
         return new JsonBookLoadingResult(letterAbsoluteRank, book, letters);
     }
 
-
-    public List<WordSearchResult> search(String word) {
-//    public List<WordSearchResult> search(String word){
+    public List<WordSearchResult> search(String word) throws IOException {
         final List<WordSearchResult> wordSearchResults = new ArrayList<>();
         final List<Els> elses = elsRepository.findTop3ByContentContainsOrderByInterval(word);
         for (Els els : elses.subList(0, 3)) {
@@ -149,21 +150,11 @@ public class GhardaiaService {
                 log.info("Letter: {}", letter);
 
                 // TODO call an external API, such as Sefaria
-                final String left = String.join("",
-                        letterRepository
-                                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank - range, currentLetterAbsoluteRank).boxed().toList())
-                                .stream()
-                                .map(it -> String.valueOf(it.getHeCharacter()))
-                                .collect(Collectors.toList())
-                );
-                final String right = String.join("",
-                        letterRepository
-                                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank + 1, currentLetterAbsoluteRank + range).boxed().toList())
-                                .stream()
-                                .map(it -> String.valueOf(it.getHeCharacter()))
-                                .collect(Collectors.toList())
-                );
-                enclosings.add(new ImmutableTriple<>(left, letter.getHeCharacter(), right));
+                final ImmutableTriple<String, Character, String> enclosing = buildEnclosing(currentLetterAbsoluteRank, letter);
+                enclosings.add(enclosing);
+
+                final String readableVerse = buildReadableVerse(letter);
+                verses.add(readableVerse);
 
             }
             wordSearchResults.add(WordSearchResult
@@ -172,9 +163,32 @@ public class GhardaiaService {
                     .interval(els.getInterval())
                     .firstLetterRank(index)
                     .enclosings(enclosings)
+                    .verses(verses)
                     .build()
             );
         }
         return wordSearchResults;
+    }
+
+    protected String buildReadableVerse(Letter letter) throws IOException {
+        final String json = IOUtils.toString(new FileReader(INPUT_FOLDER + String.format("%02d", letter.getBook()) + ".json"));
+        final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
+        final int chapter = letter.getChapter();
+        final int verse = letter.getVerse();
+        return bookDTO.getText().get(chapter).get(verse) + " (" + bookDTO.getTitle() + " " + chapter + ", " + verse + ")";
+    }
+
+    protected ImmutableTriple<String, Character, String> buildEnclosing(int currentLetterAbsoluteRank, Letter letter) {
+        final String left = letterRepository
+                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank - range, currentLetterAbsoluteRank).boxed().toList())
+                .stream()
+                .map(it -> String.valueOf(it.getHeCharacter()))
+                .collect(Collectors.joining(""));
+        final String right = letterRepository
+                .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank + 1, currentLetterAbsoluteRank + range).boxed().toList())
+                .stream()
+                .map(it -> String.valueOf(it.getHeCharacter()))
+                .collect(Collectors.joining(""));
+        return new ImmutableTriple<>(left, letter.getHeCharacter(), right);
     }
 }

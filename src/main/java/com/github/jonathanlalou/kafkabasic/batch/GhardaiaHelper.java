@@ -4,6 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GhardaiaHelper {
+    public static final String INPUT_FOLDER = "./src/main/resources/text/";
+
     public Character hebrew2Latin(Character input) {
         return switch (input) {
             /*־ */

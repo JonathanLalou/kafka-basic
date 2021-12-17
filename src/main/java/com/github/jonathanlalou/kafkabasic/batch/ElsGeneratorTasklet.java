@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOLDER;
 import static com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet.BOOKS;
 import static com.github.jonathanlalou.kafkabasic.batch.JsonFileLoadTasklet.LETTERS;
 
@@ -80,7 +81,7 @@ public class ElsGeneratorTasklet implements Tasklet, StepExecutionListener {
         if (allLetters.length() > 0) {
             log.info("Joined all letters: {}", allLetters.substring(0, 100));
         }
-        FileUtils.writeStringToFile(new File(JsonFileLoadTasklet.INPUT_FOLDER + "allLetters.txt"), allLetters, Charset.defaultCharset());
+        FileUtils.writeStringToFile(new File(INPUT_FOLDER + "allLetters.txt"), allLetters, Charset.defaultCharset());
 
         elsSequenceGenerator.generateEquidistantLetterSequences(minInterval, maxInterval, allLetters);
 
