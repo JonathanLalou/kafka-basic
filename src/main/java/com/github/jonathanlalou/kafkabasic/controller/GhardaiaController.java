@@ -53,6 +53,8 @@ public class GhardaiaController {
     ) throws Exception {
         log.info("GET /find/{}", word);
         final List<WordSearchResult> wordSearchResults = ghardaiaService.search(word, max, range);
+        model.addAttribute("max", max);
+        model.addAttribute("range", range);
         model.addAttribute("wordSearchResults", wordSearchResults);
         return "found";
     }

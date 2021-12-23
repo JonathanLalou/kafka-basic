@@ -1,33 +1,33 @@
 <!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
+<!--suppress CheckEmptyScriptTag -->
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
-    <title>Getting Started: Serving Web Content</title>
+    <title>Equidistant Letter Sequences</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
 </head>
 <body>
-<p th:text="'Hello, ' + ${wordSearchResults} + '!'"></p>
+<p th:text="'Max: ' + ${max} "/>
+<p th:text="'Range ' + ${range} "/>
+<p th:text="'Number of resuts ' + ${wordSearchResults.size()} "/>
 <div>
-<!--    <h3>All Users:</h3>
-    <div class="well">
-        &lt;!&ndash;<div class="list-group">&ndash;&gt;
-        <table class="table">
-            <th>Email</th>
-            <th>First name</th>
-            <th>Last name</th>
-            <th>First login</th>
-            <th>Address</th>
-            &lt;!&ndash;/*@thymesVar id="uzers" type="java.util.List<com.wagex.domain.model.Uzer>"*/&ndash;&gt;
-            <tr th:each="uzer: ${uzers}">
-                &lt;!&ndash;/*@thymesVar id="uzer" type="com.wagex.domain.model.Uzer"*/&ndash;&gt;
-                <td th:text="${uzer.email}"/>
-                <td th:text="${uzer.firstName}"/>
-                <td th:text="${uzer.lastName}"/>
-                <td th:text="${uzer.address}"/>
+    <div th:each="wordSearchResult : ${wordSearchResults}">
+        <h3 th:text="'Interval:  ' + ${wordSearchResult.interval} + ' - Starting at: ' + ${wordSearchResult.firstLetter}"></h3>
+        <h4>Matrix</h4>
+        <table style="font-family: 'Courier New',monospace">
+            <tr th:each="enclosing: ${wordSearchResult.enclosings}">
+                <td style="font-weight: normal" th:text="${enclosing.right}"></td>
+                <td style="font-weight: bold" th:text="${enclosing.middle}"></td>
+                <td style="font-weight: normal" th:text="${enclosing.left}"></td>
             </tr>
-            &lt;!&ndash;<a th:text="${competition.area}" th:href="${competition.value}" class="list-group-item active">Client</a>&ndash;&gt;
+        </table>
+        <h4>Verses</h4>
+        <table>
+            <tr th:each="verse : ${wordSearchResult.verses}">
+                <td th:text="${verse}"/>
+            </tr>
         </table>
     </div>
-</div>-->
+</div>
 
 </body>
 </html>
