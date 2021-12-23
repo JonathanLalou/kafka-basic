@@ -31,6 +31,7 @@ import javax.annotation.PostConstruct;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -137,7 +138,7 @@ public class GhardaiaService {
     public List<WordSearchResult> search(String word) throws IOException {
         final List<WordSearchResult> wordSearchResults = new ArrayList<>();
         final List<Els> elses = elsRepository.findTop3ByContentContainsOrderByInterval(word);
-        for (Els els : elses.subList(0, 3)) {
+        for (Els els : elses.subList(0, Math.min(3, elses.size()))) {
             final String content = els.getContent();
             final int index = StringUtils.indexOf(content, word);
             log.info("index of {} in ELS: {}", word, index);
@@ -150,7 +151,7 @@ public class GhardaiaService {
                 log.info("Letter: {}", letter);
 
                 // TODO call an external API, such as Sefaria
-                final ImmutableTriple<String, Character, String> enclosing = buildEnclosing(currentLetterAbsoluteRank, letter);
+                final ImmutableTriple<String, Character, String> enclosing = this.buildEnclosing(currentLetterAbsoluteRank, letter);
                 enclosings.add(enclosing);
 
                 final String readableVerse = buildReadableVerse(letter);
@@ -175,7 +176,7 @@ public class GhardaiaService {
         final BookDTO bookDTO = gson.fromJson(json, BookDTO.class);
         final int chapter = letter.getChapter();
         final int verse = letter.getVerse();
-        return bookDTO.getText().get(chapter).get(verse) + " (" + bookDTO.getTitle() + " " + chapter + ", " + verse + ")";
+        return bookDTO.getText().get(chapter - 1).get(verse - 1) + " (" + bookDTO.getTitle() + " " + chapter + ", " + verse + ")";
     }
 
     protected ImmutableTriple<String, Character, String> buildEnclosing(int currentLetterAbsoluteRank, Letter letter) {
