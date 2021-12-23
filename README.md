@@ -9,6 +9,14 @@
 
 cf ![Target Macro-architecture](./etc/ghardaia.png)
 
+# Java
+Set Java 17 in `PATH`:
+
+```
+set JAVA_HOME=C:\win32app\jdk-17.0.1
+set PATH=%JAVA_HOME%\bin;%PATH%
+```
+
 # Kafka
 * Start ZooKeeper
 ```

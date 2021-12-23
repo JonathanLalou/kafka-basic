@@ -2,6 +2,8 @@
 server:
   port: 8282
 spring:
+  thymeleaf:
+    cache: false
   kafka:
     consumer:
       group-id: tpd-loggers
@@ -19,6 +21,7 @@ spring:
       uri: mongodb+srv://ghardaia:ghardaia@localhost/myFirstDatabase?retryWrites=true&w=majority
 #      uri: mongodb+srv://ghardaia:ghardaia@localhost/myFirstDatabase?retryWrites=true&w=majority&authSource=admin
 
+
 # specific to current application
 tpd:
   topic-name: advice-topic
@@ -33,7 +36,7 @@ file:
   inputs: 01.json, 02.json, 03.json, 04.json, 05.json, 06.json, 07.json, 08.json, 09.json, 10.json, 11.json, 12.json, 13.json, 14.json, 15.json, 16.json, 17.json, 18.json, 19.json, 20.json, 21.json, 22.json, 23.json, 24.json, 25.json, 26.json, 27.json, 28.json, 29.json, 20.json, 31.json, 32.json, 33.json, 34.json, 35.json, 36.json, 37.json, 38.json, 39.json
 equidistantLetterSequenceGenerator:
   minInterval: 1
-  maxInterval: 2000
+  maxInterval: 15000
 #  maxInterval: 100
 ghardaia:
   cleaning: true

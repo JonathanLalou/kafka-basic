@@ -46,7 +46,7 @@ import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOL
 @Setter
 @Profile("web")
 public class GhardaiaService {
-    private final int range = 20;
+//    private final int range = 20;
     @Autowired
     private ElsRepository elsRepository;
     @Autowired
@@ -135,7 +135,7 @@ public class GhardaiaService {
         return new JsonBookLoadingResult(letterAbsoluteRank, book, letters);
     }
 
-    public List<WordSearchResult> search(String word, Integer max) throws IOException {
+    public List<WordSearchResult> search(String word, Integer max, Integer range) throws IOException {
         log.info("Searching {} with at most {} results", word, max);
 
         final List<WordSearchResult> wordSearchResults = new ArrayList<>();
@@ -154,7 +154,7 @@ public class GhardaiaService {
                 log.info("Letter: {}", letter);
 
                 // TODO call an external API, such as Sefaria
-                final ImmutableTriple<String, Character, String> enclosing = this.buildEnclosing(currentLetterAbsoluteRank, letter);
+                final ImmutableTriple<String, Character, String> enclosing = this.buildEnclosing(currentLetterAbsoluteRank, letter, range);
                 enclosings.add(enclosing);
 
                 final String readableVerse = buildReadableVerse(letter);
@@ -182,7 +182,7 @@ public class GhardaiaService {
         return bookDTO.getText().get(chapter - 1).get(verse - 1) + " (" + bookDTO.getTitle() + " " + chapter + ", " + verse + ")";
     }
 
-    protected ImmutableTriple<String, Character, String> buildEnclosing(int currentLetterAbsoluteRank, Letter letter) {
+    protected ImmutableTriple<String, Character, String> buildEnclosing(int currentLetterAbsoluteRank, Letter letter, int range) {
         final String left = letterRepository
                 .findByAbsoluteRankInOrderByAbsoluteRank(IntStream.range(currentLetterAbsoluteRank - range, currentLetterAbsoluteRank).boxed().toList())
                 .stream()
