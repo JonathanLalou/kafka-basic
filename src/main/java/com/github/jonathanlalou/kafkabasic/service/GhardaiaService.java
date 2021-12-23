@@ -32,6 +32,7 @@ import javax.annotation.PostConstruct;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,9 +45,9 @@ import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOL
 @Slf4j
 @Getter
 @Setter
-@Profile("web")
+//@Profile("web")
 public class GhardaiaService {
-//    private final int range = 20;
+    //    private final int range = 20;
     @Autowired
     private ElsRepository elsRepository;
     @Autowired
@@ -139,7 +140,11 @@ public class GhardaiaService {
         log.info("Searching {} with at most {} results", word, max);
 
         final List<WordSearchResult> wordSearchResults = new ArrayList<>();
-        final List<Els> elses = elsRepository.findByContentContainsOrderByInterval(word, Pageable.ofSize(max));
+        final List<Els> elses = new ArrayList<>();
+        elses.addAll(elsRepository.findByContentContainsOrderByInterval(word, Pageable.ofSize(max)));
+        // search for the reversed string, eg: EDCBA for ABCDE
+        elses.addAll(elsRepository.findByContentContainsOrderByInterval(StringUtils.reverse(word), Pageable.ofSize(max)));
+        elses.sort(Comparator.comparing(Els::getInterval));
 
         for (Els els : elses.subList(0, Math.min(max, elses.size()))) {
             final String content = els.getContent();
