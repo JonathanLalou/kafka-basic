@@ -15,14 +15,7 @@ import java.util.List;
 
 @RestController
 @Slf4j
-public class KafkaBasicController {
-//    @Autowired
-//    private LetterKafkaProducer letterKafkaProducer;
-
-    @Autowired
-    private LetterRepository letterRepository;
-    @Autowired
-    private ElsRepository elsRepository;
+public class GhardaiaController {
     @Autowired
     private GhardaiaService ghardaiaService;
 
@@ -33,18 +26,10 @@ public class KafkaBasicController {
         return "hello world!";
     }
 
-//    @GetMapping("/letter")
-//    @ResponseBody
-//    public Letter letter() throws Exception {
-//        log.info("GET /letter");
-//        return letterRepository.save(new Letter(999, 'X', 'X', 1, 2, 3, 4, 5, 6, 7, false));
-//    }
-
     @GetMapping(value = "/search/{word}")
     @ResponseBody()
     public List<WordSearchResult> letter(@PathVariable("word") String word) throws Exception {
         log.info("GET /search/{}", word);
-        // TODO search for the reversed word
         return ghardaiaService.search(word);
     }
 

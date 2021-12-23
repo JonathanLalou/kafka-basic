@@ -40,7 +40,7 @@ mkdir data/db
 ```
 * Start MongoDB (without access control)
 ```
-.\bin\mongod --port 27017 --dbpath /data/db1
+.\bin\mongod  --port 27017 --dbpath ./data/db
 ```
 * Connect to the instance and create the admin
 ```
