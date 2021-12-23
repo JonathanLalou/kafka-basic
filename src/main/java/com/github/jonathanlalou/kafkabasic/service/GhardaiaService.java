@@ -45,9 +45,7 @@ import static com.github.jonathanlalou.kafkabasic.batch.GhardaiaHelper.INPUT_FOL
 @Slf4j
 @Getter
 @Setter
-//@Profile("web")
 public class GhardaiaService {
-    //    private final int range = 20;
     @Autowired
     private ElsRepository elsRepository;
     @Autowired
