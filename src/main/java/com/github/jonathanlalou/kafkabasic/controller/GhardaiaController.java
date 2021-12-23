@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -28,9 +29,12 @@ public class GhardaiaController {
 
     @GetMapping(value = "/search/{word}")
     @ResponseBody()
-    public List<WordSearchResult> letter(@PathVariable("word") String word) throws Exception {
+    public List<WordSearchResult> letter(
+            @PathVariable("word") String word
+            , @RequestParam(name="max", required=false, defaultValue="3") Integer max
+    ) throws Exception {
         log.info("GET /search/{}", word);
-        return ghardaiaService.search(word);
+        return ghardaiaService.search(word, max);
     }
 
 

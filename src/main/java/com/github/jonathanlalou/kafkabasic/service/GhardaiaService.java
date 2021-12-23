@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -135,10 +136,13 @@ public class GhardaiaService {
         return new JsonBookLoadingResult(letterAbsoluteRank, book, letters);
     }
 
-    public List<WordSearchResult> search(String word) throws IOException {
+    public List<WordSearchResult> search(String word, Integer max) throws IOException {
+        log.info("Searching {} with at most {} results", word, max);
+
         final List<WordSearchResult> wordSearchResults = new ArrayList<>();
-        final List<Els> elses = elsRepository.findTop3ByContentContainsOrderByInterval(word);
-        for (Els els : elses.subList(0, Math.min(3, elses.size()))) {
+        final List<Els> elses = elsRepository.findByContentContainsOrderByInterval(word, Pageable.ofSize(max));
+
+        for (Els els : elses.subList(0, Math.min(max, elses.size()))) {
             final String content = els.getContent();
             final int index = StringUtils.indexOf(content, word);
             log.info("index of {} in ELS: {}", word, index);
